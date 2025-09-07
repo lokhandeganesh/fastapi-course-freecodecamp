@@ -36,14 +36,14 @@ Then install fastapp using all flag like
 
 ````
 
-pip install fastapi[all]
+pip install uv
 
 ````
 
 Then go this repo folder in your local computer run follwoing command
 ````
 
-uvicorn main:app --reload
+uv run uvicorn app.main:app --port 8000 --reload
 
 ````
 
@@ -56,7 +56,7 @@ http://127.0.0.1:8000/docs
 ````
 
 ## After run this API you need a database in postgres 
-Create a database in postgres then create a file name .env and write the following things in you file 
+Create a database in postgres then create a file name .env and write the following things in you file, we can copy .env-test for refernce and rename it to .env with valid values
 
 ````
 DATABASE_HOSTNAME = localhost

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from . import models
 from .database import engine
@@ -30,3 +31,8 @@ app.include_router(vote.router)
 @app.get("/")
 def root():
     return {"message": "Hello World pushing out to ubuntu"}
+
+favicon_path = "favicon.ico"  # Adjust path to file
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+	return FileResponse(favicon_path)
