@@ -120,3 +120,20 @@ async def delete_post(id:int):
 
 	my_posts.pop(index)
 	return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.put("/posts/{id}")
+async def update_post(id:int, post:Post):
+	# using index of in posts
+	index = find_index_post(id)
+
+	if not index:
+		raise HTTPException(
+			status_code= status.HTTP_404_NOT_FOUND,
+			detail = f"post with id:{id} not found."
+		)
+
+	post_dict = post.model_dump()
+	post_dict["id"] = id
+	my_posts[index] = post_dict
+
+	return {"data" : post_dict}
