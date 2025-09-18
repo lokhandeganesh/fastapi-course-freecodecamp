@@ -137,3 +137,7 @@ async def update_post(id:int, post:Post):
 	my_posts[index] = post_dict
 
 	return {"data" : post_dict}
+
+
+# Working with database
+"""Database is a collectio of organized data that can be easily accessed and managed"""
