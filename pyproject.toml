@@ -22,6 +22,7 @@ dependencies = [
     "ecdsa>=0.19.1",
     "email-validator>=2.3.0",
     "fastapi>=0.116.1",
+    "fastapi-docshield>=0.2.1",
     "graphene>=3.4.3",
     "graphql-core>=3.2.6",
     "graphql-relay>=3.2.0",

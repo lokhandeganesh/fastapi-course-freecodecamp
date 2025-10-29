@@ -7,6 +7,9 @@ from fastapi.responses import FileResponse
 # from .config import settings
 from .routers import post, user, auth, vote, course_pract
 
+from fastapi_docshield import DocShield
+from .config import settings
+
 
 # models.Base.metadata.create_all(bind=engine)
 
@@ -28,6 +31,17 @@ app.include_router(user.router)
 app.include_router(auth.router)
 app.include_router(vote.router)
 
+
+# Fetching user database for accessing docs
+
+# Add protection to docs with multiple users
+DocShield(
+	app=app,
+	credentials={
+		"admin": settings.admin_pass,
+		# "developer":settings.docshielde_pass,
+	}
+)
 
 @app.get("/")
 def root():
