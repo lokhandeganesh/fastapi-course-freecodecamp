@@ -1,0 +1,172 @@
+2025-10-30 00:36:32.475 | ERROR    | app.routers.course_pract:get_post:118 - Unhandled error: name 'i' is not defined
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 5
+               │     └ 8
+               └ <function _main at 0x71a4192845e0>
+  File "/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 5
+           │    └ <function BaseProcess._bootstrap at 0x71a419369800>
+           └ <SpawnProcess name='SpawnProcess-4' parent=12025 started>
+  File "/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x71a419368d60>
+    └ <SpawnProcess name='SpawnProcess-4' parent=12025 started>
+  File "/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x71a4190d9250>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-4' parent=12025 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-4' parent=12025 started>
+    │    └ <function subprocess_started at 0x71a418afca40>
+    └ <SpawnProcess name='SpawnProcess-4' parent=12025 started>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=4, family=2, type=1, proto=0, laddr=('127.0.0.1', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x71a418b46240>>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=4, family=2, type=1, proto=0, laddr=('127.0.0.1', 8000)>]
+           │       │   │    └ <function Server.serve at 0x71a418ae3c40>
+           │       │   └ <uvicorn.server.Server object at 0x71a418b46240>
+           │       └ <function run at 0x71a418e62ca0>
+           └ <module 'asyncio' from '/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/asyncio/_...
+  File "/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x71a4192f0120>
+           │      └ <function Runner.run at 0x71a418eb7100>
+           └ <asyncio.runners.Runner object at 0x71a418b453a0>
+  File "/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python...
+           │    │     └ <function BaseEventLoop.run_until_complete at 0x71a418eb4b80>
+           │    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x71a418b453a0>
+  File "/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 678, in run_until_complete
+    self.run_forever()
+    │    └ <function BaseEventLoop.run_forever at 0x71a418eb4ae0>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 645, in run_forever
+    self._run_once()
+    │    └ <function BaseEventLoop._run_once at 0x71a418eb68e0>
+    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
+  File "/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 1999, in _run_once
+    handle._run()
+    │      └ <function Handle._run at 0x71a418e4de40>
+    └ <Handle <_asyncio.TaskStepMethWrapper object at 0x71a415bc2b90>()>
+  File "/home/lokhandeganesh/.local/share/uv/python/cpython-3.12.11-linux-x86_64-gnu/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+    │    │            │    │           │    └ <member '_args' of 'Handle' objects>
+    │    │            │    │           └ <Handle <_asyncio.TaskStepMethWrapper object at 0x71a415bc2b90>()>
+    │    │            │    └ <member '_callback' of 'Handle' objects>
+    │    │            └ <Handle <_asyncio.TaskStepMethWrapper object at 0x71a415bc2b90>()>
+    │    └ <member '_context' of 'Handle' objects>
+    └ <Handle <_asyncio.TaskStepMethWrapper object at 0x71a415bc2b90>()>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x71a4190d8f50>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415bc2b...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+                 │    └ <fastapi.applications.FastAPI object at 0x71a418ee1400>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x71a4190d8f50>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415bc2b...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415bc2b...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x71a415b80950>
+          └ <fastapi.applications.FastAPI object at 0x71a418ee1400>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x71a418b59800>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x71a415b821e0>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x71a415b80950>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x71a418b59800>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x71a415b80aa0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x71a415b821e0>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x71a418b59800>
+          │                            │    │    │     │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+          │                            │    │    └ <starlette.requests.Request object at 0x71a41708dd30>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x71a415b80170>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x71a415b80aa0>
+          └ <function wrap_app_handling_exceptions at 0x71a417e64fe0>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71a415b87ba0>
+          │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+          └ <fastapi.routing.APIRouter object at 0x71a415b80170>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71a415b87ba0>
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x71a415b80170>>
+          └ <fastapi.routing.APIRouter object at 0x71a415b80170>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71a415b87ba0>
+          │     │      │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+          │     └ <function Route.handle at 0x71a417e667a0>
+          └ APIRoute(path='/course/posts/{id}', name='get_post', methods=['GET'])
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71a415b87ba0>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+          │    └ <function request_response.<locals>.app at 0x71a415b84cc0>
+          └ APIRoute(path='/course/posts/{id}', name='get_post', methods=['GET'])
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/routing.py", line 78, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71a415b87ba0>
+          │                            │    │        │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+          │                            │    └ <starlette.requests.Request object at 0x71a415bc2d50>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x71a415b87c40>
+          └ <function wrap_app_handling_exceptions at 0x71a417e64fe0>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71a415b87d80>
+          │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x71a415b...
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('127.0.0.1', 8000), 'cl...
+          └ <function request_response.<locals>.app.<locals>.app at 0x71a415b87c40>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/starlette/routing.py", line 75, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x71a415bc2d50>
+                     └ <function get_request_handler.<locals>.app at 0x71a415b84c20>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 302, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x71a417e647c0>
+  File "/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 213, in run_endpoint_function
+    return await dependant.call(**values)
+                 │         │      └ {'id': 5, 'response': <starlette.responses.Response object at 0x71a415bc2f00>}
+                 │         └ <function get_post at 0x71a415b6e8e0>
+                 └ Dependant(path_params=[ModelField(field_info=Path(PydanticUndefined), name='id', mode='validation')], query_params=[], header...
+
+> File "/home/lokhandeganesh/fastapi-course-freecodecamp/app/routers/course_pract.py", line 100, in get_post
+    post  = find_post(i)
+            └ <function find_post at 0x71a415fdeb60>
+
+NameError: name 'i' is not defined
