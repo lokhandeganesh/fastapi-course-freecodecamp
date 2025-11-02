@@ -15,7 +15,7 @@ jobs:
       SECRET_KEY: ${{secrets.SECRET_KEY}}
       ALGORITHM: ${{secrets.ALGORITHM}}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
-      ADMIN_PASS : ${{secrets.ADMIN_PASS}}
+      ADMIN_PASS: ${{secrets.ADMIN_PASS}}
 
     services:
       postgres:
