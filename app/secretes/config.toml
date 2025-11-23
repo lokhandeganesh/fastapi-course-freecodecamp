@@ -1,0 +1,24 @@
+# [PostgreSQL]
+database_hostname = "172.17.81.105"
+database_port = 5432
+database_name = "fast_api_course"
+database_username = "pocrapgsql"
+database_password = "postgres_2023"
+
+# [JWT]
+secret_key = "09d25e094faa2556c818166b7a99f6f0f4c3b88e8d3e7"
+algorithm = "HS256"
+access_token_expire_minutes = 60
+
+# Local ubuntu server
+# [Redis]
+redis_host = "172.17.81.105"
+redis_port = 6380
+redis_password = "pocrapostgres"
+redis_decode_response = true
+redis_db = 0
+
+# [DocShield]
+docshield_admin_pass = "admin_pass"
+docshield_developer_pass = "developer_pass"
+docshield_viewer_pass = "viewer_pass"

@@ -8,7 +8,8 @@ from fastapi.responses import FileResponse
 from .routers import post, user, auth, vote, course_pract
 
 from fastapi_docshield import DocShield
-from .config import settings
+# from .config import settings
+from app.db.db_config import settings
 from app.logger import logger
 
 
@@ -39,7 +40,7 @@ app.include_router(vote.router)
 DocShield(
 	app=app,
 	credentials={
-		"admin": settings.admin_pass,
+		"admin": settings.docshield_admin_pass,
 		# "developer":settings.docshielde_pass,
 	}
 )
