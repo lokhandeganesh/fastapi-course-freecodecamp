@@ -3,6 +3,9 @@ from fastapi import APIRouter, Response, status, HTTPException
 # from fastapi.params import Body
 from pydantic import BaseModel
 
+import uuid
+from uuid import UUID
+
 from random import randrange
 from app.logger import logger
 
@@ -10,6 +13,15 @@ router = APIRouter(
 	prefix="/course",
 	tags=['Course']
 )
+
+# function to validate Uuid
+def is_valid_uuid(uuid_to_test, version=4):
+    try:
+        # check for validity of Uuid
+        uuid_obj = uuid.UUID(uuid_to_test, version=version)
+    except ValueError:
+        return False
+    return True
 
 # /course/
 # /Course
@@ -110,6 +122,20 @@ async def get_post(id:int, response: Response):
 				detail = f"post with id:{id} not found."
 				)
 		return {"data" : post}
+	except HTTPException:
+		# Let FastAPI handle HTTPException (like 404)
+		raise
+	except Exception as e:
+		# Log the exception for debugging
+		logger.exception(f"Unhandled error: {e}")
+
+# to retrive item by uuid
+@router.get("/items/{id}")
+async def get_post_by_uuid(id:UUID, response: Response):
+	try:
+		# Code logic here
+
+		return {"data" : id}
 	except HTTPException:
 		# Let FastAPI handle HTTPException (like 404)
 		raise

@@ -20,11 +20,11 @@ app = FastAPI()
 origins = ["*"]
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+	CORSMiddleware,
+	allow_origins=origins,
+	allow_credentials=True,
+	allow_methods=["*"],
+	allow_headers=["*"],
 )
 
 app.include_router(course_pract.router)
@@ -41,14 +41,14 @@ DocShield(
 	app=app,
 	credentials={
 		"admin": settings.docshield_admin_pass,
-		# "developer":settings.docshielde_pass,
+		"developer":settings.docshield_developer_pass,
 	}
 )
 
 @app.get("/")
 def root():
-    logger.info("Hi, Welcome to FastAPI application")
-    return {"message": "Hello World pushing out to ubuntu"}
+	logger.info("Hi, Welcome to FastAPI application")
+	return {"message": "Hello World pushing out to ubuntu"}
 
 favicon_path = "favicon.ico"  # Adjust path to file
 @app.get("/favicon.ico", include_in_schema=False)

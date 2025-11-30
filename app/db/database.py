@@ -6,5 +6,5 @@ conninfo = f"user={settings.database_username} password={settings.database_passw
 
 @lru_cache()
 def get_async_pool():
-    return AsyncConnectionPool(conninfo = conninfo, open = False)
+	return AsyncConnectionPool(conninfo = conninfo, open = False)
 

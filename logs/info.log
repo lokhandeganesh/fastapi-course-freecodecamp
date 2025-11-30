@@ -1,3 +1,4 @@
 2025-10-30 00:33:58.865 | INFO     | app.routers.course_pract:get_post:102 - post with id:5 not found.
 2025-10-30 00:39:22.038 | INFO     | app.main:root:49 - Hi, Welcome to PoCRA Webservices
 2025-10-30 00:39:53.955 | INFO     | app.main:root:49 - Hi, Welcome to FastAPI application
+2025-11-30 23:35:39.685 | INFO     | app.main:root:54 - Hi, Welcome to FastAPI application
