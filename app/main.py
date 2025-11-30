@@ -7,6 +7,10 @@ from fastapi.responses import FileResponse
 # from .config import settings
 from .routers import post, user, auth, vote, course_pract
 
+from fastapi_docshield import DocShield
+from .config import settings
+from app.logger import logger
+
 
 # models.Base.metadata.create_all(bind=engine)
 
@@ -29,8 +33,20 @@ app.include_router(auth.router)
 app.include_router(vote.router)
 
 
+# Fetching user database for accessing docs
+
+# Add protection to docs with multiple users
+DocShield(
+	app=app,
+	credentials={
+		"admin": settings.admin_pass,
+		# "developer":settings.docshielde_pass,
+	}
+)
+
 @app.get("/")
 def root():
+    logger.info("Hi, Welcome to FastAPI application")
     return {"message": "Hello World pushing out to ubuntu"}
 
 favicon_path = "favicon.ico"  # Adjust path to file

@@ -22,7 +22,7 @@
 First clone this repo by using following command
 ````
 
-git clone https://github.com/Sanjeev-Thiyagarajan/fastapi-course.git
+git clone https://github.com/lokhandeganesh/fastapi-course-freecodecamp.git
 
 ````
 then 
@@ -47,7 +47,8 @@ uv run uvicorn app.main:app --port 8000 --reload
 
 ````
 
-Then you can use following link to use the  API
+Then you can use following link to use the  API, our swagger protected using docshield,
+check .env file for password, this can be changed in main.py files DocShield section.
 
 ````
 
@@ -67,6 +68,9 @@ DATABASE_USERNAME = User_name
 SECRET_KEY = 09d25e094faa2556c818166b7a99f6f0f4c3b88e8d3e7 
 ALGORITHM = HS256
 ACCESS_TOKEN_EXPIRE_MINUTES = 60(base)
+ADMIN_PASS = admin_pass
+#DEVELOPER_PASS = developer_pass
+#VIEWER_PASS = viewer_pass
 
 ````
 ### Note: SECRET_KEY in this exmple is just a psudo key. You need to get a key for youself and you can get the SECRET_KEY  from fastapi documantion

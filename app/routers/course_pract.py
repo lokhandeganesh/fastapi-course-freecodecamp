@@ -4,6 +4,7 @@ from fastapi import APIRouter, Response, status, HTTPException
 from pydantic import BaseModel
 
 from random import randrange
+from app.logger import logger
 
 router = APIRouter(
 	prefix="/course",
@@ -95,17 +96,26 @@ async def get_latest_post():
 # to retrive post from posts
 @router.get("/posts/{id}")
 async def get_post(id:int, response: Response):
-	post  = find_post(id)
+	try:
+		post  = find_post(id)
 
-	if not post:
-		# response.status_code = status.HTTP_404_NOT_FOUND
-		# return {"message" : f"post with id:{id} not found."}
+		if not post:
+			logger.info(f"post with id:{id} not found.")
 
-		raise HTTPException(
-			status_code = status.HTTP_404_NOT_FOUND,
-			detail = f"post with id:{id} not found."
-			)
-	return {"data" : post}
+			# response.status_code = status.HTTP_404_NOT_FOUND
+			# return {"message" : f"post with id:{id} not found."}
+
+			raise HTTPException(
+				status_code = status.HTTP_404_NOT_FOUND,
+				detail = f"post with id:{id} not found."
+				)
+		return {"data" : post}
+	except HTTPException:
+		# Let FastAPI handle HTTPException (like 404)
+		raise
+	except Exception as e:
+		# Log the exception for debugging
+		logger.exception(f"Unhandled error: {e}")
 
 @router.delete("/posts/{id}", status_code= status.HTTP_204_NO_CONTENT)
 async def delete_post(id:int):
