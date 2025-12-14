@@ -70,6 +70,7 @@ class Post(BaseModel):
 	content: str
 	published: bool = True
 	rating : Optional[int] = 1
+	owner_id : int
 
 # @router.post("/create_posts_model")
 # async def create_posts_model(post: Post):
@@ -203,3 +204,16 @@ async def get_db_posts():
 	cursor.execute("SELECT * FROM posts")
 	posts = cursor.fetchall()
 	return {"data" : posts}
+
+# post method to create post
+@router.post("/db_posts", status_code = status.HTTP_201_CREATED)
+async def create_db_posts(post:Post):
+	cursor.execute(
+		"""INSERT INTO posts (title, content, published, owner_id)
+		VALUES (%s, %s, %s, %s) RETURNING *""",
+		(post.title, post.content, post.published, post.owner_id))
+
+	new_post = cursor.fetchone()
+	conn.commit()
+	# print(post_dict)
+	return {"data" : new_post}
