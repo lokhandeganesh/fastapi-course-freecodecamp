@@ -217,3 +217,40 @@ async def create_db_posts(post:Post):
 	conn.commit()
 	# print(post_dict)
 	return {"data" : new_post}
+
+# to retrive post from posts
+@router.get("/db_posts/{id}")
+async def get_db_post(id:int, response: Response):
+	cursor.execute("""SELECT * FROM posts WHERE id = %s""",	(str(id),))
+	post = cursor.fetchone()
+
+	try:
+		if not post:
+			logger.info(f"post with id:{id} not found.")
+
+			raise HTTPException(
+				status_code = status.HTTP_404_NOT_FOUND,
+				detail = f"post with id:{id} not found."
+				)
+		return {"data" : post}
+	except HTTPException:
+		# Let FastAPI handle HTTPException (like 404)
+		raise
+	except Exception as e:
+		# Log the exception for debugging
+		logger.exception(f"Unhandled error: {e}")
+
+@router.delete("/db_posts/{id}", status_code= status.HTTP_204_NO_CONTENT)
+async def delete_db_post(id:int):
+	cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", (str(id),))
+	deleted_post = cursor.fetchone()
+
+	conn.commit()
+
+	if not deleted_post:
+		raise HTTPException(
+			status_code= status.HTTP_404_NOT_FOUND,
+			detail = f"post with id:{id} not found."
+		)
+
+	return Response(status_code=status.HTTP_204_NO_CONTENT)
