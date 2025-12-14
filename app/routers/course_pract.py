@@ -9,6 +9,27 @@ from uuid import UUID
 from random import randrange
 from app.logger import logger
 
+# from ..database import get_db
+import psycopg
+from psycopg.rows import dict_row
+import time
+
+from app.config import settings
+
+
+conninfo = f"user={settings.database_username} password={settings.database_password} host={settings.database_hostname} port={settings.database_port} dbname={settings.database_name}"
+
+while True:
+    try:
+        conn = psycopg.connect(conninfo = conninfo, row_factory=dict_row)
+        cursor = conn.cursor()
+        print("Database connection was succesfull!")
+        break
+    except Exception as error:
+        print("Connecting to database failed")
+        print("Error: ", error)
+        time.sleep(2)
+
 router = APIRouter(
 	prefix="/course",
 	tags=['Course']
@@ -177,3 +198,8 @@ async def update_post(id:int, post:Post):
 
 # Working with database
 """Database is a collectio of organized data that can be easily accessed and managed"""
+@router.get("/db_posts")
+async def get_db_posts():
+	cursor.execute("SELECT * FROM posts")
+	posts = cursor.fetchall()
+	return {"data" : posts}
