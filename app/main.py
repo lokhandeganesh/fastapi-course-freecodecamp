@@ -50,7 +50,7 @@ def root():
 	logger.info("Hi, Welcome to FastAPI application")
 	return {"message": "Hello World pushing out to ubuntu"}
 
-favicon_path = "favicon.ico"  # Adjust path to file
+favicon_path = r"app/static/favicon.ico"  # Adjust path to file
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
 	return FileResponse(favicon_path)

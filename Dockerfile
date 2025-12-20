@@ -21,6 +21,9 @@ RUN uv sync --frozen --no-cache
 # CMD ["/usr/src/app/.venv/bin/uvicorn", "app.main:app", "--port", "8000", "--host", "0.0.0.0"]
 
 # Run the application with gunicorn for production
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+COPY entrypoint.sh /usr/src/entrypoint.sh
+RUN chmod +x /usr/src/entrypoint.sh
+ENTRYPOINT ["/usr/src/entrypoint.sh"]
+
+# Copy the favicon
+COPY ./app/static/favicon.ico /usr/src/app/app/static/favicon.ico
