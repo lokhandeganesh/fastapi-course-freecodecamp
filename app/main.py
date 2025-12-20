@@ -2,18 +2,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from . import models
-from .database import engine
+# from . import models
+# from .database import engine
 # from .config import settings
 from .routers import post, user, auth, vote, course_pract
 
 from fastapi_docshield import DocShield
-# from .config import settings
-from app.db.db_config import settings
+from .config import settings
+# from app.db.db_config import settings
 from app.logger import logger
 
 
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

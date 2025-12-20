@@ -201,15 +201,15 @@ async def update_post(id:int, post:Post):
 """Database is a collectio of organized data that can be easily accessed and managed"""
 @router.get("/db_posts")
 async def get_db_posts():
-	cursor.execute("SELECT * FROM posts")
+	cursor.execute("SELECT * FROM course.posts")
 	posts = cursor.fetchall()
 	return {"data" : posts}
 
-# post method to create post
+# post method to create course.post
 @router.post("/db_posts", status_code = status.HTTP_201_CREATED)
 async def create_db_posts(post:Post):
 	cursor.execute(
-		"""INSERT INTO posts (title, content, published, owner_id)
+		"""INSERT INTO course.posts (title, content, published, owner_id)
 		VALUES (%s, %s, %s, %s) RETURNING *""",
 		(post.title, post.content, post.published, post.owner_id))
 
@@ -221,7 +221,7 @@ async def create_db_posts(post:Post):
 # to retrive post from posts
 @router.get("/db_posts/{id}")
 async def get_db_post(id:int, response: Response):
-	cursor.execute("""SELECT * FROM posts WHERE id = %s""",	(str(id),))
+	cursor.execute("""SELECT * FROM course.posts WHERE id = %s""",	(str(id),))
 	post = cursor.fetchone()
 
 	try:
@@ -242,7 +242,7 @@ async def get_db_post(id:int, response: Response):
 
 @router.delete("/db_posts/{id}", status_code= status.HTTP_204_NO_CONTENT)
 async def delete_db_post(id:int):
-	cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", (str(id),))
+	cursor.execute("""DELETE FROM course.posts WHERE id = %s RETURNING *""", (str(id),))
 	deleted_post = cursor.fetchone()
 
 	conn.commit()
@@ -259,7 +259,7 @@ async def delete_db_post(id:int):
 async def update_db_post(id:int, post:Post):
 	cursor.execute(
 		"""
-		UPDATE posts
+		UPDATE course.posts
 			SET
 				title = %s, content = %s,
 				published = %s, owner_id = %s
