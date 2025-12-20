@@ -1,6 +1,6 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, text
+# from sqlalchemy.ext.declarative import declarative_base # old way deprecated
+from sqlalchemy.orm import sessionmaker, declarative_base
 # import psycopg2
 # from psycopg2.extras import RealDictCursor
 # import time
@@ -10,6 +10,9 @@ SQLALCHEMY_DATABASE_URL = f'postgresql+psycopg://{settings.database_username}:{s
 
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+with engine.begin() as conn:
+    conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
