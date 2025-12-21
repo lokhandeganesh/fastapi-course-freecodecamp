@@ -9,7 +9,13 @@ from uuid import UUID
 from random import randrange
 from app.logger import logger
 
-# from ..database import get_db
+# Sqlalchemy imports
+from app.database import get_db
+from sqlalchemy.orm import Session
+from fastapi import Depends
+from app import models
+
+# psycopg imports
 from app.database import conn, cursor
 
 router = APIRouter(
@@ -262,3 +268,28 @@ async def update_db_post(id:int, post:Post):
 		)
 
 	return {"data" : updated_post}
+
+# Connections from sqlalchemy
+@router.get("/sqla_posts")
+async def get_sqla_posts(db:Session = Depends(get_db)):
+	posts = db.query(models.Post).all()
+	return {"data" : posts}
+
+# post method to create course.post
+@router.post("/sqla_posts", status_code = status.HTTP_201_CREATED)
+async def create_sqla_posts(post:Post, db:Session = Depends(get_db)):
+	new_post = models.Post(
+		title=post.title,
+		content=post.content,
+		published=post.published,
+		owner_id=post.owner_id
+		)
+
+	# add new_post to session
+	db.add(new_post)
+	# commit the changes to database
+	db.commit()
+	# refresh the new_post object to get updated data from database
+	db.refresh(new_post)
+
+	return {"data" : new_post}
