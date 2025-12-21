@@ -10,25 +10,7 @@ from random import randrange
 from app.logger import logger
 
 # from ..database import get_db
-import psycopg
-from psycopg.rows import dict_row
-import time
-
-from app.config import settings
-
-
-conninfo = f"user={settings.database_username} password={settings.database_password} host={settings.database_hostname} port={settings.database_port} dbname={settings.database_name}"
-
-while True:
-    try:
-        conn = psycopg.connect(conninfo = conninfo, row_factory=dict_row)
-        cursor = conn.cursor()
-        print("Database connection was succesfull!")
-        break
-    except Exception as error:
-        print("Connecting to database failed")
-        print("Error: ", error)
-        time.sleep(2)
+from app.database import conn, cursor
 
 router = APIRouter(
 	prefix="/course",
