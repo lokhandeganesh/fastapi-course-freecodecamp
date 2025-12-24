@@ -292,7 +292,17 @@ async def create_sqla_posts(post:Post, db:Session = Depends(get_db)):
 async def get_sqla_post(id:int, response: Response, db:Session = Depends(get_db)):
 
 	# query to get post by id
-	post = db.query(models.Post).filter(models.Post.id == id).first()
+	query = db.query(models.Post).filter(models.Post.id == id)
+
+	engine = db.get_bind()
+	print(
+		query.statement.compile(
+			dialect=engine.dialect,
+			compile_kwargs={"literal_binds": True}
+			)
+	)
+
+	post = query.first()
 
 	try:
 		if not post:

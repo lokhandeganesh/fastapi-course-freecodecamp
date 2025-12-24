@@ -9,7 +9,10 @@ import time
 SQLALCHEMY_DATABASE_URL = f'postgresql+psycopg://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
 
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(
+	SQLALCHEMY_DATABASE_URL
+	# ,echo = True # enable logging of SQL queries
+    )
 
 with engine.begin() as conn:
 	conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
