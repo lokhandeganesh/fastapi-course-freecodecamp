@@ -14,6 +14,7 @@ from app.database import get_db
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from app import models
+from app import schemas
 
 # psycopg imports
 from app.database import conn, cursor
@@ -52,8 +53,8 @@ async def get_root():
 # 	# print(payload)
 # 	return {"new_post" : f"title {payload['title']}"}
 
-
-class Post(BaseModel):
+# Defining Pydantic Model, which is moved to schemas.py
+class PostRef(BaseModel):
 	title: str
 	content: str
 	published: bool = True
@@ -98,7 +99,7 @@ async def get_posts():
 
 # post method to create post
 @router.post("/posts", status_code = status.HTTP_201_CREATED)
-async def create_posts(post:Post):
+async def create_posts(post:PostRef):
 	post_dict = post.model_dump()
 	post_dict['id'] = randrange(0, 1000000000)
 	my_posts.append(post_dict)
@@ -165,7 +166,7 @@ async def delete_post(id:int):
 	return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @router.put("/posts/{id}")
-async def update_post(id:int, post:Post):
+async def update_post(id:int, post:PostRef):
 	# using index of in posts
 	index = find_index_post(id)
 
@@ -192,7 +193,7 @@ async def get_db_posts():
 
 # post method to create course.post
 @router.post("/db_posts", status_code = status.HTTP_201_CREATED)
-async def create_db_posts(post:Post):
+async def create_db_posts(post:PostRef):
 	cursor.execute(
 		"""INSERT INTO course.posts (title, content, published, owner_id)
 		VALUES (%s, %s, %s, %s) RETURNING *""",
@@ -241,7 +242,7 @@ async def delete_db_post(id:int):
 	return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @router.put("/db_posts/{id}")
-async def update_db_post(id:int, post:Post):
+async def update_db_post(id:int, post:PostRef):
 	cursor.execute(
 		"""
 		UPDATE course.posts
@@ -274,7 +275,7 @@ async def get_sqla_posts(db:Session = Depends(get_db)):
 
 # post method to create course.post
 @router.post("/sqla_posts", status_code = status.HTTP_201_CREATED)
-async def create_sqla_posts(post:Post, db:Session = Depends(get_db)):
+async def create_sqla_posts(post:schemas.PostCreate, db:Session = Depends(get_db)):
 	# print(post.model_dump())
 	new_post = models.Post(**post.model_dump())
 
@@ -292,17 +293,18 @@ async def create_sqla_posts(post:Post, db:Session = Depends(get_db)):
 async def get_sqla_post(id:int, response: Response, db:Session = Depends(get_db)):
 
 	# query to get post by id
-	query = db.query(models.Post).filter(models.Post.id == id)
+	post = db.query(models.Post).filter(models.Post.id == id).first()
 
-	engine = db.get_bind()
-	print(
-		query.statement.compile(
-			dialect=engine.dialect,
-			compile_kwargs={"literal_binds": True}
-			)
-	)
-
-	post = query.first()
+	# Debug: Print the generated SQL query
+	# query = db.query(models.Post).filter(models.Post.id == id)
+	# engine = db.get_bind()
+	# print(
+	# 	query.statement.compile(
+	# 		dialect=engine.dialect,
+	# 		compile_kwargs={"literal_binds": True}
+	# 		)
+	# )
+	# post = query.first()
 
 	try:
 		if not post:
@@ -343,7 +345,7 @@ async def delete_sqla_post(id:int, db:Session = Depends(get_db)):
 
 # to update post from course.posts table
 @router.put("/sqla_posts/{id}")
-async def update_sqla_post(id:int, post:Post, db:Session = Depends(get_db)):
+async def update_sqla_post(id:int, post:schemas.PostCreate, db:Session = Depends(get_db)):
 
 	# query to update post by id
 	post_query = db.query(models.Post).filter(models.Post.id == id)
