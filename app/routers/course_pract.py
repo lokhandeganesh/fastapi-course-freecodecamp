@@ -1,4 +1,4 @@
-from typing import Optional
+# from typing import Optional
 from fastapi import APIRouter, Response, status, HTTPException
 # from fastapi.params import Body
 from pydantic import BaseModel
@@ -275,12 +275,8 @@ async def get_sqla_posts(db:Session = Depends(get_db)):
 # post method to create course.post
 @router.post("/sqla_posts", status_code = status.HTTP_201_CREATED)
 async def create_sqla_posts(post:Post, db:Session = Depends(get_db)):
-	new_post = models.Post(
-		title=post.title,
-		content=post.content,
-		published=post.published,
-		owner_id=post.owner_id
-		)
+	# print(post.model_dump())
+	new_post = models.Post(**post.model_dump())
 
 	# add new_post to session
 	db.add(new_post)
