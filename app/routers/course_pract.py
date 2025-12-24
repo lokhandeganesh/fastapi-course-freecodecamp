@@ -1,4 +1,4 @@
-# from typing import Optional
+from typing import Optional, List
 from fastapi import APIRouter, Response, status, HTTPException
 # from fastapi.params import Body
 from pydantic import BaseModel
@@ -268,14 +268,14 @@ async def update_db_post(id:int, post:PostRef):
 	return {"data" : updated_post}
 
 # Connections from sqlalchemy
-@router.get("/sqla_posts")
+@router.get("/sqla_posts", response_model = List[schemas.PostCreateUp])
 async def get_sqla_posts(db:Session = Depends(get_db)):
 	posts = db.query(models.Post).all()
-	return {"data" : posts}
+	return posts
 
 # post method to create course.post
-@router.post("/sqla_posts", status_code = status.HTTP_201_CREATED)
-async def create_sqla_posts(post:schemas.PostCreate, db:Session = Depends(get_db)):
+@router.post("/sqla_posts", status_code = status.HTTP_201_CREATED, response_model = schemas.PostCreateUp)
+async def create_sqla_posts(post:schemas.PostCreateUp, db:Session = Depends(get_db)):
 	# print(post.model_dump())
 	new_post = models.Post(**post.model_dump())
 
@@ -286,7 +286,7 @@ async def create_sqla_posts(post:schemas.PostCreate, db:Session = Depends(get_db
 	# refresh the new_post object to get updated data from database
 	db.refresh(new_post)
 
-	return {"data" : new_post}
+	return new_post
 
 # to retrive post from posts
 @router.get("/sqla_posts/{id}")
@@ -314,7 +314,7 @@ async def get_sqla_post(id:int, response: Response, db:Session = Depends(get_db)
 				status_code = status.HTTP_404_NOT_FOUND,
 				detail = f"post with id:{id} not found."
 				)
-		return {"data" : post}
+		return post
 	except HTTPException:
 		# Let FastAPI handle HTTPException (like 404)
 		raise
@@ -366,4 +366,4 @@ async def update_sqla_post(id:int, post:schemas.PostCreate, db:Session = Depends
 	# commit the changes to database
 	db.commit()
 
-	return {"data" : post_query.first()}
+	return post_query.first()
