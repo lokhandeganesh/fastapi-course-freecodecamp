@@ -21,10 +21,14 @@ from app import schemas
 from app.database import conn, cursor
 
 # Password hashing imports
-from passlib.context import CryptContext
+from app import utils
+# from passlib.context import CryptContext
 
 # define password hashing scheme
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Implementing Argon2 password hashing
+from app import utils_argon
 
 router = APIRouter(
 	prefix="/course",
@@ -33,12 +37,12 @@ router = APIRouter(
 
 # function to validate Uuid
 def is_valid_uuid(uuid_to_test, version=4):
-    try:
-        # check for validity of Uuid
-        uuid_obj = uuid.UUID(uuid_to_test, version=version)
-    except ValueError:
-        return False
-    return True
+	try:
+		# check for validity of Uuid
+		uuid_obj = uuid.UUID(uuid_to_test, version=version)
+	except ValueError:
+		return False
+	return True
 
 # /course/
 # /Course
@@ -381,7 +385,7 @@ async def update_sqla_post(id:int, post:schemas.PostCreate, db:Session = Depends
 async def create_sqla_users(user:schemas.UserCreate, db:Session = Depends(get_db)):
 
 	# hash the password - user.password
-	hashed_password = pwd_context.hash(user.password)
+	hashed_password = utils.hash(user.password)
 	# update the user.password with hashed password
 	user.password = hashed_password
 
@@ -409,6 +413,54 @@ async def create_sqla_users(user:schemas.UserCreate, db:Session = Depends(get_db
 			)
 
 		raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Could not create user due to data constraint"
-        )
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="Could not create user due to data constraint"
+		)
+
+@router.post("/sqla_users_argon", status_code = status.HTTP_201_CREATED, response_model = schemas.UserOut)
+async def create_sqla_users_argon(user:schemas.UserCreate, db:Session = Depends(get_db)):
+
+	# hash the password - user.password
+	hashed_password = utils_argon.hash_password(user.password)
+	# update the user.password with hashed password
+	user.password = hashed_password
+
+	new_user = models.User(**user.model_dump())
+
+	# add new_post to session
+	db.add(new_user)
+
+	try:
+		# commit the changes to database
+		db.commit()
+		# refresh the new_user object to get created in the database
+		db.refresh(new_user)
+
+		return new_user
+
+	except IntegrityError as e:
+		db.rollback()
+		logger.error(f"IntegrityError: {e.orig}")
+
+		if "users_email_key" in str(e.orig):
+			raise HTTPException(
+				status_code=status.HTTP_409_CONFLICT,
+				detail="User with this email already exists."
+			)
+
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="Could not create user due to data constraint"
+		)
+
+@router.get("/sqla_users/{id}", response_model=schemas.UserOut)
+def get_sqla_user(id:int, db:Session = Depends(get_db)):
+	user  = db.query(models.User).filter(models.User.id ==id).first()
+
+	if not user:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail=f"User with id:{id} does not exist."
+		)
+
+	return user

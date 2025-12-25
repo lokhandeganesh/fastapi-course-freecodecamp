@@ -8,6 +8,7 @@ dependencies = [
     "aiofiles>=24.1.0",
     "alembic>=1.16.5",
     "aniso8601>=10.0.1",
+    "argon2-cffi>=25.1.0",
     "async-exit-stack>=1.0.1",
     "async-generator>=1.10",
     "autopep8>=2.3.2",
