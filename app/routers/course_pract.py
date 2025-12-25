@@ -20,6 +20,12 @@ from app import schemas
 # psycopg imports
 from app.database import conn, cursor
 
+# Password hashing imports
+from passlib.context import CryptContext
+
+# define password hashing scheme
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 router = APIRouter(
 	prefix="/course",
 	tags=['Course']
@@ -373,6 +379,12 @@ async def update_sqla_post(id:int, post:schemas.PostCreate, db:Session = Depends
 # post method to create course.post
 @router.post("/sqla_users", status_code = status.HTTP_201_CREATED, response_model = schemas.UserOut)
 async def create_sqla_users(user:schemas.UserCreate, db:Session = Depends(get_db)):
+
+	# hash the password - user.password
+	hashed_password = pwd_context.hash(user.password)
+	# update the user.password with hashed password
+	user.password = hashed_password
+
 	new_user = models.User(**user.model_dump())
 
 	# add new_post to session
