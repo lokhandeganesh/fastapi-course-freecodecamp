@@ -12,6 +12,7 @@ from app.logger import logger
 # Sqlalchemy imports
 from app.database import get_db
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from fastapi import Depends
 from app import models
 from app import schemas
@@ -367,3 +368,35 @@ async def update_sqla_post(id:int, post:schemas.PostCreate, db:Session = Depends
 	db.commit()
 
 	return post_query.first()
+
+# User Authentication and Authorization
+# post method to create course.post
+@router.post("/sqla_users", status_code = status.HTTP_201_CREATED, response_model = schemas.UserOut)
+async def create_sqla_users(user:schemas.UserCreate, db:Session = Depends(get_db)):
+	new_user = models.User(**user.model_dump())
+
+	# add new_post to session
+	db.add(new_user)
+
+	try:
+		# commit the changes to database
+		db.commit()
+		# refresh the new_user object to get created in the database
+		db.refresh(new_user)
+
+		return new_user
+
+	except IntegrityError as e:
+		db.rollback()
+		logger.error(f"IntegrityError: {e.orig}")
+
+		if "users_email_key" in str(e.orig):
+			raise HTTPException(
+				status_code=status.HTTP_409_CONFLICT,
+				detail="User with this email already exists."
+			)
+
+		raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Could not create user due to data constraint"
+        )
