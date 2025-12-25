@@ -3,20 +3,25 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 # from . import models
-# from .database import engine
+
+# need to import models to create tables, moved to separate folder
+from .model import models
+
+from .database import engine
+
 # from .config import settings
 
 from .routers import post, user, auth, vote, course_pract
 # routers for course
-from .routers_course import post as course_post, user as course_user
+from .routers_course import post as course_post, user as course_user, auth as course_auth
 
 from fastapi_docshield import DocShield
 from .config import settings
 # from app.db.db_config import settings
-from app.logger import logger
+from app.logging.logger import logger
 
 
-# models.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -31,8 +36,10 @@ app.add_middleware(
 )
 
 app.include_router(course_pract.router)
+
 app.include_router(course_post.router)
 app.include_router(course_user.router)
+app.include_router(course_auth.router)
 
 app.include_router(post.router)
 app.include_router(user.router)

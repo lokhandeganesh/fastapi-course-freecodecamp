@@ -7,10 +7,10 @@ from typing import List
 from app.database import get_db
 from sqlalchemy.orm import Session
 
-from app import models
-from app import schemas
+from app.model import models
+from app.schema import schemas
 
-from app.logger import logger
+from app.logging.logger import logger
 
 router = APIRouter(
 	prefix="/course_posts",
@@ -20,14 +20,14 @@ router = APIRouter(
 # Connections from sqlalchemy
 @router.get("/", response_model = List[schemas.PostCreateUp])
 async def get_course_posts(db:Session = Depends(get_db)):
-	posts = db.query(models.Post).all()
+	posts = db.query(models.PostJWT).all()
 	return posts
 
 # post method to create course.post
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model = schemas.PostCreateUp)
 async def create_course_posts(post:schemas.PostCreateUp, db:Session = Depends(get_db)):
 	# print(post.model_dump())
-	new_post = models.Post(**post.model_dump())
+	new_post = models.PostJWT(**post.model_dump())
 
 	# add new_post to session
 	db.add(new_post)
@@ -42,7 +42,7 @@ async def create_course_posts(post:schemas.PostCreateUp, db:Session = Depends(ge
 @router.get("/{id}")
 async def get_course_post(id:int, response: Response, db:Session = Depends(get_db)):
 	# query to get post by id
-	post = db.query(models.Post).filter(models.Post.id == id).first()
+	post = db.query(models.PostJWT).filter(models.PostJWT.id == id).first()
 
 	try:
 		if not post:
@@ -64,7 +64,7 @@ async def get_course_post(id:int, response: Response, db:Session = Depends(get_d
 @router.delete("/{id}", status_code= status.HTTP_204_NO_CONTENT)
 async def delete_course_post(id:int, db:Session = Depends(get_db)):
 	# query to delete post by id
-	post = db.query(models.Post).filter(models.Post.id == id)
+	post = db.query(models.PostJWT).filter(models.PostJWT.id == id)
 
 	if not post.first():
 		raise HTTPException(
@@ -84,7 +84,7 @@ async def delete_course_post(id:int, db:Session = Depends(get_db)):
 @router.put("/{id}")
 async def update_course_post(id:int, post:schemas.PostCreate, db:Session = Depends(get_db)):
 	# query to update post by id
-	post_query = db.query(models.Post).filter(models.Post.id == id)
+	post_query = db.query(models.PostJWT).filter(models.PostJWT.id == id)
 
 	# retrive the post for updating
 	updated_post = post_query.first()

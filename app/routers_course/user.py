@@ -1,14 +1,14 @@
 from fastapi import APIRouter, status, HTTPException
 
-from app.logger import logger
+from app.logging.logger import logger
 
 # Sqlalchemy imports
 from app.database import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from fastapi import Depends
-from app import models
-from app import schemas
+from app.model import models
+from app.schema import schemas
 
 # Implementing Argon2 password hashing
 from app.utils_folder import utils
@@ -27,7 +27,7 @@ async def create_course_users(user:schemas.UserCreate, db:Session = Depends(get_
 	# update the user.password with hashed password
 	user.password = hashed_password
 
-	new_user = models.User(**user.model_dump())
+	new_user = models.UserJWT(**user.model_dump())
 
 	# add new_post to session
 	db.add(new_user)
@@ -57,7 +57,7 @@ async def create_course_users(user:schemas.UserCreate, db:Session = Depends(get_
 
 @router.get("/{id}", response_model=schemas.UserOut)
 def get_course_user(id:int, db:Session = Depends(get_db)):
-	user  = db.query(models.User).filter(models.User.id ==id).first()
+	user  = db.query(models.UserJWT).filter(models.UserJWT.id ==id).first()
 
 	if not user:
 		raise HTTPException(

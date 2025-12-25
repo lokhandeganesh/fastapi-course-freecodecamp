@@ -16,6 +16,8 @@ engine = create_engine(
 
 with engine.begin() as conn:
 	conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
+	conn.execute(text("CREATE SCHEMA IF NOT EXISTS course_jwt"))
+
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
