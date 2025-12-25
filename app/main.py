@@ -5,7 +5,10 @@ from fastapi.responses import FileResponse
 # from . import models
 # from .database import engine
 # from .config import settings
+
 from .routers import post, user, auth, vote, course_pract
+# routers for course
+from .routers_course import post as course_post, user as course_user
 
 from fastapi_docshield import DocShield
 from .config import settings
@@ -28,6 +31,9 @@ app.add_middleware(
 )
 
 app.include_router(course_pract.router)
+app.include_router(course_post.router)
+app.include_router(course_user.router)
+
 app.include_router(post.router)
 app.include_router(user.router)
 app.include_router(auth.router)
