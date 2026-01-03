@@ -8,7 +8,7 @@ from app.database import get_db
 from sqlalchemy.orm import Session
 
 from app.model import models
-from app.schema import schemas
+# from app.schema import schemas
 
 # Implementing Argon2 password hashing
 from app.utils_folder import utils
