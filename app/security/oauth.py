@@ -8,6 +8,8 @@ from fastapi import Depends, HTTPException, status
 from app.config import settings
 from app.schema import schemas
 
+import uuid
+
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
@@ -38,14 +40,13 @@ def verify_access_token(token:str, credentials_exceptions):
         payload = jwt.decode(jwt = token, key = SECRET_KEY, algorithms=[ALGORITHM])
 
         # Extract the user_id from the payload
-        id: str = payload.get("user_id")
+        user_id: uuid.UUID = payload.get("user_id")
 
-        if id is None:
+        if user_id is None:
             raise credentials_exceptions
 
         # validate the token data format using Pydantic schema
-        token_data = schemas.TokenData(id=id)
-
+        token_data = schemas.TokenData(id = user_id)
         # return the token data
         return token_data
 

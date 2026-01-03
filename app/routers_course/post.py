@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response, status, HTTPException
 from fastapi import Depends
 from typing import List
-
+import uuid
 
 # Sqlalchemy imports
 from app.database import get_db
@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.model import models
 from app.schema import schemas
+from app.security import oauth
+
 
 from app.logging.logger import logger
 
@@ -25,7 +27,13 @@ async def get_course_posts(db:Session = Depends(get_db)):
 
 # post method to create course.post
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model = schemas.PostCreateUp)
-async def create_course_posts(post:schemas.PostCreateUp, db:Session = Depends(get_db)):
+async def create_course_posts(
+	post:schemas.PostCreateUp, db:Session = Depends(get_db),
+	user_id: uuid.UUID = Depends(oauth.get_current_user)
+	):
+
+	print(user_id)
+
 	# print(post.model_dump())
 	new_post = models.PostJWT(**post.model_dump())
 

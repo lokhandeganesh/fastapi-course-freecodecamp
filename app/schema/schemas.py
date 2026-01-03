@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional
+import uuid
 
 
 
@@ -10,7 +11,7 @@ class PostBase(BaseModel):
 	published: bool = True
 
 class PostCreateUp(PostBase):
-	owner_id: int
+	owner_id: uuid.UUID
 
 	class Config:
 		# this method is deprecated in Pydantic v2
@@ -23,7 +24,7 @@ class PostCreate(PostBase):
 
 
 class UserOut(BaseModel):
-	id: int
+	id: uuid.UUID
 	email: EmailStr
 	created_at: datetime
 
@@ -65,7 +66,7 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-	id: Optional[str] = None
+	id: Optional[uuid.UUID] = None
 
 
 class Vote(BaseModel):

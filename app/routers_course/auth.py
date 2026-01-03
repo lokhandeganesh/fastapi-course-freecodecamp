@@ -52,13 +52,14 @@ async def course_login(
 			detail="Invalid Credentials"
 		)
 
-	logger.info(f"User logged in with email: {user_credentials.username}")
 
 	# Creating a JWT token
 	# data that we want to include in the token
-	data = {"user_id": user.id}
+	data = {"user_id": str(user.id)}
 
 	# create access token with the data required
-	access_token = oauth.create_access_token(data= data)
+	access_token = oauth.create_access_token(data = data)
+
+	logger.info(f"User logged in with email: {user_credentials.username}")
 
 	return {"access_token" : access_token, "token_type": "bearer"}

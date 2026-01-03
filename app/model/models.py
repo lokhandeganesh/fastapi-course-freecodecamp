@@ -22,7 +22,7 @@ class PostJWT(Base):
 		server_default=text('now()')
 		)
 	owner_id = Column(
-		Integer,
+		UUID(as_uuid=True),
 		ForeignKey(
 			"course_jwt.users.id",
 			ondelete="CASCADE"),
