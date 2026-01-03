@@ -19,6 +19,22 @@ class PostCreateUp(PostBase):
 		# orm_mode = True
 		from_attributes = True
 
+class PostRetrieve(PostBase):
+	id: int
+
+	class Config:
+		# this method is deprecated in Pydantic v2
+		# orm_mode = True
+		from_attributes = True
+
+class PostCreation(PostBase):
+	owner_id: uuid.UUID
+
+	class Config:
+		# this method is deprecated in Pydantic v2
+		# orm_mode = True
+		from_attributes = True
+
 
 class PostCreate(PostBase):
 	pass
