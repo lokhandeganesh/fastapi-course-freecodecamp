@@ -1,16 +1,16 @@
 from fastapi import APIRouter, Response, status, HTTPException
 from fastapi import Depends
 from typing import List
-import uuid
+# import uuid
 
 # Sqlalchemy imports
 from app.database import get_db
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 from app.model import models
 from app.schema import schemas
 from app.security import oauth
-
 
 from app.logging.logger import logger
 
@@ -22,17 +22,28 @@ router = APIRouter(
 # Connections from sqlalchemy
 @router.get("/", response_model = List[schemas.PostCreateUp])
 async def get_course_posts(db:Session = Depends(get_db)):
-	posts = db.query(models.PostJWT).all()
+	# posts = db.query(models.PostJWT).all()
+
+	# to load only specific columns
+	stmt = select(
+		models.PostJWT.id,
+		models.PostJWT.title,
+		models.PostJWT.content,
+		models.PostJWT.published
+		)
+
+	posts = db.execute(stmt).mappings().all()
+
 	return posts
 
 # post method to create course.post
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model = schemas.PostCreateUp)
 async def create_course_posts(
 	post:schemas.PostCreateUp, db:Session = Depends(get_db),
-	user_id: uuid.UUID = Depends(oauth.get_current_user)
-	):
+	users_data: str = Depends(oauth.get_current_user)):
 
-	print(user_id)
+	# we can access user data from token_data
+	# print(users_data.id)
 
 	# print(post.model_dump())
 	new_post = models.PostJWT(**post.model_dump())
@@ -48,7 +59,14 @@ async def create_course_posts(
 
 # to retrive post from posts
 @router.get("/{id}")
-async def get_course_post(id:int, response: Response, db:Session = Depends(get_db)):
+async def get_course_post(
+	id:int, response: Response, db:Session = Depends(get_db),
+	users_data: str = Depends(oauth.get_current_user)
+	):
+
+	# we can access user data from token_data
+	# print(users_data.id)
+
 	# query to get post by id
 	post = db.query(models.PostJWT).filter(models.PostJWT.id == id).first()
 
@@ -70,7 +88,13 @@ async def get_course_post(id:int, response: Response, db:Session = Depends(get_d
 
 # to delete post from course.posts table
 @router.delete("/{id}", status_code= status.HTTP_204_NO_CONTENT)
-async def delete_course_post(id:int, db:Session = Depends(get_db)):
+async def delete_course_post(
+	id:int, db:Session = Depends(get_db),
+	users_data: str = Depends(oauth.get_current_user)):
+
+	# we can access user data from token_data
+	# print(users_data.id)
+
 	# query to delete post by id
 	post = db.query(models.PostJWT).filter(models.PostJWT.id == id)
 
@@ -90,7 +114,13 @@ async def delete_course_post(id:int, db:Session = Depends(get_db)):
 
 # to update post from course.posts table
 @router.put("/{id}")
-async def update_course_post(id:int, post:schemas.PostCreate, db:Session = Depends(get_db)):
+async def update_course_post(
+	id:int, post:schemas.PostCreate, db:Session = Depends(get_db),
+	users_data: str = Depends(oauth.get_current_user)):
+
+	# we can access user data from token_data
+	# print(users_data.id)
+
 	# query to update post by id
 	post_query = db.query(models.PostJWT).filter(models.PostJWT.id == id)
 

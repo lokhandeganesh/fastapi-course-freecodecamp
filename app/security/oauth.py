@@ -19,6 +19,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='course_auth/login')
 # Define the IST timezone
 IST_TZ = ZoneInfo("Asia/Kolkata")
 
+# Function to create JWT access token
 def create_access_token(data : dict ):
     # Create a copy of the data dictionary
     to_encode = data.copy()
@@ -34,6 +35,7 @@ def create_access_token(data : dict ):
 
     return encoded_jwt
 
+# Function to verify JWT access token
 def verify_access_token(token:str, credentials_exceptions):
     try:
         # Decode the JWT token
@@ -53,6 +55,7 @@ def verify_access_token(token:str, credentials_exceptions):
     except PyJWTError:
         raise credentials_exceptions
 
+# Dependency to get the current user from the token
 def get_current_user(token:str = Depends(oauth2_scheme)):
     credentials_exceptions = HTTPException(
         status_code = status.HTTP_401_UNAUTHORIZED,

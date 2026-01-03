@@ -8,7 +8,7 @@ from app.database import get_db
 from sqlalchemy.orm import Session
 
 from app.model import models
-# from app.schema import schemas
+from app.schema import schemas
 
 # Implementing Argon2 password hashing
 from app.utils_folder import utils
@@ -22,7 +22,7 @@ router = APIRouter(
 )
 
 # (Authentication routes can be added here in the future)
-@router.post("/login")
+@router.post("/login", response_model = schemas.Token)
 async def course_login(
 	user_credentials:OAuth2PasswordRequestForm = Depends(),
 	db: Session = Depends(get_db)):

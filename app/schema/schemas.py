@@ -11,7 +11,8 @@ class PostBase(BaseModel):
 	published: bool = True
 
 class PostCreateUp(PostBase):
-	owner_id: uuid.UUID
+	# owner_id: uuid.UUID
+	id: int
 
 	class Config:
 		# this method is deprecated in Pydantic v2
