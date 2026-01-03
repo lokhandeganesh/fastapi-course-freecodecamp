@@ -26,3 +26,18 @@ def create_access_token(data : dict ):
     encoded_jwt = jwt.encode(payload=to_encode, key=SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
+
+def verify_access_token(token:str, credentials_exceptions):
+    try:
+        # Decode the JWT token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        # Extract the user_id from the payload
+        id: str = payload.get("user_id")
+        if id is None:
+            raise credentials_exceptions
+
+        return id
+
+    except PyJWTError:
+        raise credentials_exceptions

@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 from app.database import Base
 
@@ -34,7 +36,8 @@ class UserJWT(Base):
 	__table_args__ = {"schema": "course_jwt"}
 	__tablename__ = "users"
 
-	id = Column(Integer, primary_key=True, nullable=False)
+	# id = Column(Integer, primary_key=True, nullable=False)
+	id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
 	email = Column(String, nullable=False, unique=True)
 	password = Column(String, nullable=False)
 	created_at = Column(

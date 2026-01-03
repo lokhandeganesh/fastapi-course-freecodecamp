@@ -27,7 +27,7 @@ async def course_login(
 	user_credentials:OAuth2PasswordRequestForm = Depends(),
 	db: Session = Depends(get_db)):
 	# then request form will return data in the form of
-	#  {}
+	#  {
 	#   "username": "string",
 	#   "password": "string"
 	#  }
@@ -54,7 +54,11 @@ async def course_login(
 
 	logger.info(f"User logged in with email: {user_credentials.username}")
 
-	# Create a token
-	access_token = oauth.create_access_token(data={"user_id": user.id})
+	# Creating a JWT token
+	# data that we want to include in the token
+	data = {"user_id": user.id}
+
+	# create access token with the data required
+	access_token = oauth.create_access_token(data= data)
 
 	return {"access_token" : access_token, "token_type": "bearer"}

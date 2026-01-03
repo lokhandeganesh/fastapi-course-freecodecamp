@@ -65,7 +65,7 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-	id: Optional[int] = None
+	id: Optional[str] = None
 
 
 class Vote(BaseModel):
