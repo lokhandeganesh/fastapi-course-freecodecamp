@@ -3,7 +3,13 @@ from datetime import datetime
 from typing import Optional
 import uuid
 
+class UserOut(BaseModel):
+	id: uuid.UUID
+	email: EmailStr
+	created_at: datetime
 
+	class Config:
+		from_attributes = True
 
 class PostBase(BaseModel):
 	title: str
@@ -28,6 +34,18 @@ class PostRetrieve(PostBase):
 		# orm_mode = True
 		from_attributes = True
 
+class PostRetrieveOwner(PostBase):
+	id: int
+	owner_id: uuid.UUID
+
+	# defining owner as UserOut schema
+	owner: UserOut
+
+	class Config:
+		# this method is deprecated in Pydantic v2
+		# orm_mode = True
+		from_attributes = True
+
 class PostCreation(PostBase):
 	owner_id: uuid.UUID
 
@@ -40,14 +58,6 @@ class PostCreation(PostBase):
 class PostCreate(PostBase):
 	pass
 
-
-class UserOut(BaseModel):
-	id: uuid.UUID
-	email: EmailStr
-	created_at: datetime
-
-	class Config:
-		from_attributes = True
 
 
 class Post(PostBase):

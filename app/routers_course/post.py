@@ -59,7 +59,7 @@ async def create_course_posts(
 	return new_post
 
 # to retrive post from posts
-@router.get("/{id}")
+@router.get("/{id}", response_model = schemas.PostRetrieveOwner)
 async def get_course_post(
 	id:int, response: Response, db:Session = Depends(get_db),
 	users_data: str = Depends(oauth.get_current_user)
