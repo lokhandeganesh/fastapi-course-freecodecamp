@@ -29,7 +29,8 @@ async def get_course_posts(db:Session = Depends(get_db)):
 		models.PostJWT.id,
 		models.PostJWT.title,
 		models.PostJWT.content,
-		models.PostJWT.published
+		models.PostJWT.published,
+		models.PostJWT.owner_id
 		)
 
 	posts = db.execute(stmt).mappings().all()
@@ -96,19 +97,34 @@ async def delete_course_post(
 	# print(users_data.id)
 
 	# query to delete post by id
-	post = db.query(models.PostJWT).filter(models.PostJWT.id == id)
+	post_query = db.query(models.PostJWT).filter(models.PostJWT.id == id)
 
-	if not post.first():
+	# retrive the post for deleting
+	post = post_query.first()
+
+	if not post:
+		logger.info(f"post with id:{id} not found.")
+
 		raise HTTPException(
 			status_code= status.HTTP_404_NOT_FOUND,
 			detail = f"post with id:{id} not found."
 		)
 
+	# we will chekk if the user is the owner of the post before deleting
+	if not post.owner_id == users_data.id:
+		logger.info(f"user is not owner of post with id:{id}.")
+		raise HTTPException(
+			status_code= status.HTTP_403_FORBIDDEN,
+			detail = "Not authorized to perform requested action."
+		)
+
 	# delete the post
-	post.delete(synchronize_session=False)
+	post_query.delete(synchronize_session=False)
 
 	# commit the changes to database
 	db.commit()
+
+	logger.info(f"post with id:{id} deleted.")
 
 	return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -129,9 +145,18 @@ async def update_course_post(
 
 	# using index of in posts
 	if not updated_post:
+		logger.info(f"post with id:{id} not found.")
 		raise HTTPException(
 			status_code= status.HTTP_404_NOT_FOUND,
 			detail = f"post with id:{id} not found."
+		)
+
+	# we will chekk if the user is the owner of the post before updating
+	if not updated_post.owner_id == users_data.id:
+		logger.info(f"user is not owner of post with id:{id}.")
+		raise HTTPException(
+			status_code= status.HTTP_403_FORBIDDEN,
+			detail = "Not authorized to perform requested action."
 		)
 
 	# update the post
@@ -139,5 +164,7 @@ async def update_course_post(
 
 	# commit the changes to database
 	db.commit()
+
+	logger.info(f"post with id:{id} updated.")
 
 	return post_query.first()

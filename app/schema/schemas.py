@@ -21,6 +21,7 @@ class PostCreateUp(PostBase):
 
 class PostRetrieve(PostBase):
 	id: int
+	owner_id: uuid.UUID
 
 	class Config:
 		# this method is deprecated in Pydantic v2
