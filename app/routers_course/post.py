@@ -6,7 +6,7 @@ from typing import List, Optional
 # Sqlalchemy imports
 from app.database import get_db
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+# from sqlalchemy import select
 
 from app.model import models
 from app.schema import schemas
