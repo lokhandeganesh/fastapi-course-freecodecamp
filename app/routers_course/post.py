@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, status, HTTPException
 from fastapi import Depends
-from typing import List
+from typing import List, Optional
 # import uuid
 
 # Sqlalchemy imports
@@ -21,19 +21,30 @@ router = APIRouter(
 
 # Connections from sqlalchemy
 @router.get("/", response_model = List[schemas.PostRetrieve])
-async def get_course_posts(db:Session = Depends(get_db)):
+async def get_course_posts(db:Session = Depends(get_db), limit:int = 5, skip:int = 0, search:Optional[str] = ""):
+	# checking path parameter
+	# print(limit)
+
+	# query to get all posts
 	# posts = db.query(models.PostJWT).all()
 
-	# to load only specific columns
-	stmt = select(
-		models.PostJWT.id,
-		models.PostJWT.title,
-		models.PostJWT.content,
-		models.PostJWT.published,
-		models.PostJWT.owner_id
-		)
+	# limiting number of posts returned
+	posts = db.query(models.PostJWT).filter(
+				models.PostJWT.title.contains(search)
+			).order_by(
+					models.PostJWT.id
+				).limit(limit).offset(skip).all()
 
-	posts = db.execute(stmt).mappings().all()
+	# to load only specific columns
+	# stmt = select(
+	# 	models.PostJWT.id,
+	# 	models.PostJWT.title,
+	# 	models.PostJWT.content,
+	# 	models.PostJWT.published,
+	# 	models.PostJWT.owner_id
+	# 	)
+
+	# posts = db.execute(stmt).mappings().all()
 
 	return posts
 
