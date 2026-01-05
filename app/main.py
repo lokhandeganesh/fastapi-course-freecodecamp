@@ -13,7 +13,7 @@ from .database import engine
 
 from .routers import post, user, auth, vote, course_pract
 # routers for course
-from .routers_course import post as course_post, user as course_user, auth as course_auth
+from .routers_course import post as course_post, user as course_user, auth as course_auth, vote as course_vote
 
 from fastapi_docshield import DocShield
 from .config import settings
@@ -39,6 +39,7 @@ app.include_router(course_pract.router)
 
 app.include_router(course_post.router)
 app.include_router(course_user.router)
+app.include_router(course_vote.router)
 app.include_router(course_auth.router)
 
 app.include_router(post.router)

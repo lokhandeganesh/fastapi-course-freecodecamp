@@ -52,7 +52,7 @@ class VoteJWT(Base):
 	__tablename__ = "votes"
 
 	user_id = Column(
-		Integer,
+		UUID(as_uuid=True),
 		ForeignKey(
 			"course_jwt.users.id",
 			ondelete="CASCADE"),
