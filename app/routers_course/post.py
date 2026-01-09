@@ -89,7 +89,7 @@ async def create_course_posts(
 	return new_post
 
 # to retrive post from posts
-@router.get("/{id}", response_model = schemas.PostRetrieveOwner)
+@router.get("/{id}", response_model = schemas.PostRetrieveOut)
 async def get_course_post(
 	id:int, response: Response, db:Session = Depends(get_db),
 	users_data:str = Depends(oauth.get_current_user)
@@ -99,7 +99,21 @@ async def get_course_post(
 	# print(users_data.id)
 
 	# query to get post by id
-	post = db.query(models.PostJWT).filter(models.PostJWT.id == id).first()
+	PostAlias = aliased(models.PostJWT, name="Post")
+	# post = db.query(models.PostJWT).filter(models.PostJWT.id == id).first()
+
+	post = db.query(
+			PostAlias,
+			func.count(models.VoteJWT.post_id).label("votes")
+			).join(
+				models.VoteJWT,
+				models.VoteJWT.post_id == PostAlias.id,
+				isouter=True
+				).filter(
+					PostAlias.id == id
+					).group_by(
+						PostAlias.id
+						).first()
 
 	try:
 		if not post:
