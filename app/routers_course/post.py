@@ -5,8 +5,8 @@ from typing import List, Optional
 
 # Sqlalchemy imports
 from app.database import get_db
-from sqlalchemy.orm import Session
-# from sqlalchemy import select
+from sqlalchemy.orm import Session, aliased
+from sqlalchemy import func #, select
 
 from app.model import models
 from app.schema import schemas
@@ -20,7 +20,7 @@ router = APIRouter(
 )
 
 # Connections from sqlalchemy
-@router.get("/", response_model = List[schemas.PostRetrieve])
+@router.get("/", response_model = List[schemas.PostRetrieveOut])
 async def get_course_posts(db:Session = Depends(get_db), limit:int = 5, skip:int = 0, search:Optional[str] = ""):
 	# checking path parameter
 	# print(limit)
@@ -29,11 +29,11 @@ async def get_course_posts(db:Session = Depends(get_db), limit:int = 5, skip:int
 	# posts = db.query(models.PostJWT).all()
 
 	# limiting number of posts returned
-	posts = db.query(models.PostJWT).filter(
-				models.PostJWT.title.contains(search)
-			).order_by(
-					models.PostJWT.id
-				).limit(limit).offset(skip).all()
+	# posts = db.query(models.PostJWT).filter(
+	# 			models.PostJWT.title.contains(search)
+	# 		).order_by(
+	# 				models.PostJWT.id
+	# 			).limit(limit).offset(skip).all()
 
 	# to load only specific columns
 	# stmt = select(
@@ -46,6 +46,25 @@ async def get_course_posts(db:Session = Depends(get_db), limit:int = 5, skip:int
 
 	# posts = db.execute(stmt).mappings().all()
 
+	# performing joins of posts and votes
+	# We need to use aliasing because ORM and Pydantic have trouble
+	# handling models with the schema output name conflicts
+	PostAlias = aliased(models.PostJWT, name="Post")
+
+	posts = db.query(
+		PostAlias,
+		func.count(models.VoteJWT.post_id).label("votes")
+		).join(
+			models.VoteJWT,
+			models.VoteJWT.post_id == PostAlias.id,
+			isouter=True
+			).group_by(
+				PostAlias.id
+				).filter(
+					PostAlias.title.contains(search)
+					).limit(limit).offset(skip).all()
+
+	# return [{"Post": post, "votes": votes} for post, votes in posts]
 	return posts
 
 # post method to create course.post

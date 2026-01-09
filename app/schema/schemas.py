@@ -6,7 +6,7 @@ import uuid
 class UserOut(BaseModel):
 	id: uuid.UUID
 	email: EmailStr
-	created_at: datetime
+	# created_at: datetime
 
 	class Config:
 		from_attributes = True
@@ -15,6 +15,7 @@ class PostBase(BaseModel):
 	title: str
 	content: str
 	published: bool = True
+	created_at: datetime
 
 class PostCreateUp(PostBase):
 	# owner_id: uuid.UUID
@@ -36,7 +37,7 @@ class PostRetrieve(PostBase):
 
 class PostRetrieveOwner(PostBase):
 	id: int
-	owner_id: uuid.UUID
+	# owner_id: uuid.UUID
 
 	# defining owner as UserOut schema
 	owner: UserOut
@@ -44,6 +45,13 @@ class PostRetrieveOwner(PostBase):
 	class Config:
 		# this method is deprecated in Pydantic v2
 		# orm_mode = True
+		from_attributes = True
+
+class PostRetrieveOut(BaseModel):
+	Post: PostRetrieveOwner
+	votes: int
+
+	class Config:
 		from_attributes = True
 
 class PostCreation(PostBase):
@@ -63,7 +71,7 @@ class PostCreate(PostBase):
 class Post(PostBase):
 	id: int
 	created_at: datetime
-	owner_id: int
+	owner_id: uuid.UUID
 	owner: UserOut
 
 	class Config:
