@@ -5,9 +5,9 @@ from fastapi.responses import FileResponse
 # from . import models
 
 # need to import models to create tables, moved to separate folder
-from .model import models
+# from .model import models
 
-from .database import engine
+# from .database import engine
 
 # from .config import settings
 
@@ -21,7 +21,7 @@ from .config import settings
 from app.logging.logger import logger
 
 
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

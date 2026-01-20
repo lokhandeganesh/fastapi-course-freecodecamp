@@ -8,6 +8,8 @@ import time
 
 SQLALCHEMY_DATABASE_URL = f'postgresql+psycopg://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
 
+# or we can import database_url from settings
+# SQLALCHEMY_DATABASE_URL = settings.database_url
 
 engine = create_engine(
 	SQLALCHEMY_DATABASE_URL
