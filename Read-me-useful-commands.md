@@ -47,3 +47,6 @@ you can find docs of almebic by running
 
 * to run previous version, can simply run commands using numrical value, like `+1, +2 or -1, -2`, where each number represents steps from current version
 `uv run alembic upgrade +1`
+
+* almebic is intelegent enough to detect your models defination and your current tabel structure in db
+`uv run alembic revision --autogenerate -m "auto-vote"`
