@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import Optional
 import uuid
 
+from sqlalchemy import func
+
 class UserOut(BaseModel):
 	id: uuid.UUID
 	email: EmailStr
@@ -15,7 +17,7 @@ class PostBase(BaseModel):
 	title: str
 	content: str
 	published: bool = True
-	created_at: datetime
+	created_at: datetime = func.now()
 
 class PostCreateUp(PostBase):
 	# owner_id: uuid.UUID
@@ -88,6 +90,7 @@ class PostOut(BaseModel):
 
 class UserCreate(BaseModel):
 	email: EmailStr
+	phone_number: Optional[str] = None
 	password: str
 
 

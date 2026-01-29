@@ -1,4 +1,4 @@
-### This document will help you to introduce useful commands to run project
+## This document will help you to introduce useful commands to run project
 
 ### Working with `uv`
 
@@ -10,7 +10,7 @@
   An extremely fast Python package and project manager
 </div>
 
-#### To install uv or check version
+### To install uv or check version
 `pip install uv`
 
 * then lets check whether its installed properly by printing its version
@@ -20,6 +20,15 @@
 * if you want to add new dependancy library into project, eg. pandas
 
 `uv add pandas`
+
+### Running project
+
+after installing `uv` we will spin our project directory to run as local server,
+here we will bind our `main.py` which is kept inside of `app` folder to `:app`, with port of `8000` and we will reload server if any changes happen to file with flag `--reload`
+
+`uv run uvicorn app.main:app --port 8000 --reload`
+
+this will run our project with `http://localhost:8000`
 
 ### Working with `almebic`
 
