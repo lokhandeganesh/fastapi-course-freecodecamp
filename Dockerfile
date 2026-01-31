@@ -16,14 +16,14 @@ COPY . /usr/src/app
 WORKDIR /usr/src/app
 RUN uv sync --frozen --no-cache
 
+# Copy the favicon
+COPY ./app/static/favicon.ico /usr/src/app/app/static/favicon.ico
 
 # Run the application.
-CMD ["/usr/src/app/.venv/bin/uvicorn", "app.main:app", "--port", "8000", "--host", "0.0.0.0"]
+# CMD ["/usr/src/app/.venv/bin/uvicorn", "app.main:app", "--port", "8000", "--host", "0.0.0.0"]
+CMD ["/usr/src/app/.venv/bin/gunicorn", "app.main:app", "--bind", "0.0.0.0:8000", "--worker-class", "uvicorn.workers.UvicornWorker"]
 
 # Run the application with gunicorn for production
 # COPY entrypoint.sh /usr/src/entrypoint.sh
 # RUN chmod +x /usr/src/entrypoint.sh
 # ENTRYPOINT ["/usr/src/entrypoint.sh"]
-
-# Copy the favicon
-COPY ./app/static/favicon.ico /usr/src/app/app/static/favicon.ico
