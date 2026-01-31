@@ -12,7 +12,7 @@ EnvironmentFile=/home/lokhandeganesh/fastapi-course-freecodecamp/.env
 
 ExecStart=/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/bin/gunicorn \
   app.main:app \
-  -c gunicorn.conf.py
+  -c hosting/updated-gunicorn.conf.py
 
 Restart=always
 RestartSec=5

@@ -97,10 +97,123 @@ you can find docs of almebic by running
 ### Working with Service file to host application
 `sudo systemctl daemon-reload`
 
+`sudo systemctl restart fastapi-updated-backend.service`
+
+`sudo systemctl status fastapi-updated-backend.service`
+
+`journalctl -xeu fastapi-updated-backend.service`
+
+Enable service so it can up on system reboot
+`sudo systemctl enable fastapi-updated-backend.service`
+this will create the symlink and you will see output like
+
+`Created symlink /etc/systemd/system/multi-user.target.wants/fastapi-updated-backend.service → /etc/systemd/system/fastapi-updated-backend.service.`
+
+If we want to print the `.env` variables loaded on service running
+`cat /run/gunicorn/workers.env`
+
+### Working with webserver
+#### NGINX
+* High performance webserver that can act as a proxy
+* Can handle SSL termination
+
+![Nginx Server](/application_documentation/image.png)
+
+install nginx into system
+`sudo apt install nginx -y`
+
+Since nginx is inactive, you must start it first:
+`sudo systemctl start nginx`
+
+Optional but recommended: enable on boot
+`sudo systemctl enable nginx`
+
+Now check status:
+`sudo systemctl status nginx`
+
+You should see:
+Active: active (running)
+
+hide Server header (advanced)
+`sudo apt install nginx-extras`
+
+from project foler in name of  `application_documentation` copy the sample `nginx_fastapi_gunicorn_service.conf` file to the location
+`/etc/nginx/sites-available` by running
+
+`sudo cp /your-project-file-path/hosting/nginx_fastapi_gunicorn_service.conf .`
+you can make necessary changes as required, but thi file will work
+
+we will create the symlink file to load our conf file into the folder `/etc/nginx/sites-enabled`, lets run the below command
+
+Disable the default site
+`sudo unlink /etc/nginx/sites-enabled/default`
+(or, equivalently)
+`sudo rm /etc/nginx/sites-enabled/default`
+This only removes the symlink, not the actual file in sites-available.
+
+Enable your new FastAPI config
+Create a symlink from sites-available → sites-enabled:
+`sudo ln -s /etc/nginx/sites-available/nginx_fastapi_gunicorn_service.conf /etc/nginx/sites-enabled/nginx_fastapi_gunicorn_service.conf`
+
+Lets check whether is there any syntax error is there in file
+`sudo nginx -t`
+if above command returns
+
+```
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+then it means we are good to go
+
+now lets reload nginx to take effect of our newly created service
+`sudo systemctl reload nginx`
+
+
+your service will be available with proxy name as `http;//your-ip-address/webservice`
+
+#### What to restart when code/config changes
+You changed FastAPI application code (.py files)
+* Restart Gunicorn service, NOT nginx.
+
 `sudo systemctl restart fastapi.service`
 
-`sudo systemctl status fastapi.service`
+Why?
+* Gunicorn loads your Python code into memory
+* Code changes are NOT picked up automatically in production
+* Nginx just forwards requests — it doesn’t care about Python code
 
-`journalctl -xeu fastapi.service`
 
-`cat /run/gunicorn/workers.env`
+What NOT to restart
+| Change | Don’t restart |
+|---|---|
+|FastAPI code	|nginx
+|Nginx config	|gunicorn
+|.env values  |nginx
+
+🧠 Mental model (easy to remember)
+
+* Nginx → traffic cop 🚦
+* Gunicorn → app engine 🚗
+* FastAPI → engine internals 🔧
+
+Change engine internals? → restart engine
+Change traffic rules? → reload traffic cop
+
+* if required
+Log rotation (IMPORTANT)
+
+Create `/etc/logrotate.d/nginx-fastapi`
+
+```
+/var/log/nginx/fastapi_*.log {
+  daily
+  rotate 14
+  compress
+  missingok
+  notifempty
+  sharedscripts
+  postrotate
+      systemctl reload nginx > /dev/null 2>&1 || true
+  endscript
+}
+```

@@ -23,7 +23,15 @@ from app.logging.logger import logger
 
 # models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(
+	# lifespan=lifespan,
+	root_path="/webservice",
+    docs_url="/webservice/docs",
+    redoc_url=None,
+    openapi_url="/webservice/openapi.json",
+	# makes curl show /webservice/...
+	servers=[{"url": "/webservice"}],
+	)
 
 origins = ["*"]
 
