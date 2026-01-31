@@ -40,7 +40,7 @@ async def course_login(
 	if not user:
 		logger.warning(f"User Account does not exist: {user_credentials.username}")
 		raise HTTPException(
-			status_code=status.HTTP_403_FORBIDDEN,
+			status_code=status.HTTP_401_UNAUTHORIZED,
 			detail="Invalid Credentials"
 		)
 
@@ -55,7 +55,7 @@ async def course_login(
 
 	# Creating a JWT token
 	# data that we want to include in the token
-	data = {"user_id": str(user.id)}
+	data = {"sub": str(user.id)}
 
 	# create access token with the data required
 	access_token = oauth.create_access_token(data = data)

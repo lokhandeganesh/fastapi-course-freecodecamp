@@ -42,7 +42,7 @@ def verify_access_token(token:str, credentials_exceptions):
         payload = jwt.decode(jwt = token, key = SECRET_KEY, algorithms=[ALGORITHM])
 
         # Extract the user_id from the payload
-        user_id: uuid.UUID = payload.get("user_id")
+        user_id: uuid.UUID = payload.get("sub")
 
         if user_id is None:
             raise credentials_exceptions
