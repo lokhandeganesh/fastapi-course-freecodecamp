@@ -1,0 +1,21 @@
+[Unit]
+Description=fastapi application
+After=network.target
+
+[Service]
+User=lokhandeganesh
+Group=lokhandeganesh
+WorkingDirectory=/home/lokhandeganesh/fastapi-course-freecodecamp/
+
+Environment="PATH=/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/bin"
+EnvironmentFile=/home/lokhandeganesh/fastapi-course-freecodecamp/.env
+
+ExecStart=/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/bin/gunicorn \
+  app.main:app \
+  -c gunicorn.conf.py
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

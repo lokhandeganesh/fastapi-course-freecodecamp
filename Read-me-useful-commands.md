@@ -79,3 +79,28 @@ you can find docs of almebic by running
 
 * almebic is intelegent enough to detect your models defination and your current tabel structure in db
 `uv run alembic revision --autogenerate -m "auto-vote"`
+
+### Working with Docker
+
+`docker ps`
+
+`docker images`
+
+`docker system prune -f`
+
+`docker rmi $(docker images -aq)`
+
+`docker build -t backend:backend .`
+
+`docker run --env-file ./.env -p 8000:8000 --rm backend:backend`
+
+### Working with Service file to host application
+`sudo systemctl daemon-reload`
+
+`sudo systemctl restart fastapi.service`
+
+`sudo systemctl status fastapi.service`
+
+`journalctl -xeu fastapi.service`
+
+`cat /run/gunicorn/workers.env`
