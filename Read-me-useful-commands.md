@@ -30,6 +30,26 @@ here we will bind our `main.py` which is kept inside of `app` folder to `:app`, 
 
 this will run our project with `http://localhost:8000`
 
+### Working with Environment varibale `.env`
+We can set the secrete of our project required variable values,
+like Database, Server crediantials
+in our project if we have `.env` file, then we can set all values to systems enviorenment by running
+`set -o allexport; source /home/your-env-file-location/.env; set +o allexport`
+
+then we can check whether our values are set to `env` or not by running
+`printenv`
+
+`note:` if we reboot our machine then all values set by above command will be flushed, to overcome this we can set our `.env` file values on start-up
+
+change your `cwd` on your home directory by running `cd ~`
+
+run `ls -la` to check file with name `.procfile`
+
+open this `.procfile` in your favioute editor, eg `vi .procfile`, and then at bottom of the file paste the command
+`set -o allexport; source /home/your-env-file-location/.env; set +o allexport`
+
+then reconnect with your system by `exit` or `reboot` and you can check your variables in environment by running `printenv`, this will keep your `.env` files values into your system whenever you reboot or exit, hence no flush or values.
+
 ### Working with `almebic`
 
 Alembic provides for the creation, management, and invocation of change management scripts for a relational database, using SQLAlchemy as the underlying engine
