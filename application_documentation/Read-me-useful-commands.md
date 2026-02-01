@@ -118,10 +118,16 @@ Production
 
 Using `docker-compose`
 if you want to up your Dockerfile
-`docker-compose up`
+`docker-compose up -d`
 
 if any changes happen to code of file and you want to rebuild the image
-`docker-compose up --build`
+`docker-compose up -d --build`
+
+Running custom docker compose file
+`docker-compose -f docker-compose-prod.yml up -d --remove-orphans`
+
+To shutdown and terminate the Docker
+`docker-compose down`
 
 ### Working with Service file to host application
 `sudo systemctl daemon-reload`
