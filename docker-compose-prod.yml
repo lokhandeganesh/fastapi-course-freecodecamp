@@ -1,29 +1,21 @@
 version: "3"
 services:
-  api:
-    image: sloppynetworks/fastapi-app
+  backend:
+    # # build the Docker image using the Dockerfile in the current directory
+    build: .
+    # # map the port 9090 of the container to port 9090 on localhost
     ports:
-      - 80:8000
-    environment:
-      - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
-      - DATABASE_PORT=${DATABASE_PORT}
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
-      - DATABASE_NAME=${DATABASE_NAME}
-      - DATABASE_USERNAME=${DATABASE_USERNAME}
-      - SECRET_KEY=${SECRET_KEY}
-      - ALGORITHM=${ALGORITHM}
-      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
-
-    depends_on:
-      - postgres
-
-  postgres:
-    image: postgres
-    environment:
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=${DATABASE_NAME}
-    volumes:
-      - postgres-db:/var/lib/postgresql/data
-
-volumes:
-  postgres-db:
+      # - <port on localhost>: <>port in container>
+      - 9090:9090
+    # # copy environment variables from .env file
+    env_file:
+      - ./.env
+    # # command to run the FastAPI application with Gunicorn for production
+    command: >
+      sh -c "WORKERS=$$(nproc);
+      if [ $$WORKERS -gt 4 ]; then WORKERS=4; fi;
+      WORKERS=$$((WORKERS * 2 + 1));
+      uv run gunicorn app.main:app
+      --bind 0.0.0.0:9090
+      --worker-class uvicorn.workers.UvicornWorker
+      --workers=$$WORKERS"
