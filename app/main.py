@@ -70,7 +70,7 @@ DocShield(
 @app.get("/")
 def root():
 	logger.info("Hi, Welcome to FastAPI application")
-	return {"message": "Hello World pushing out to ubuntu with live changes!"}
+	return {"message": "Hello World pushing out to ubuntu"}
 
 favicon_path = r"app/static/favicon.ico"  # Adjust path to file
 @app.get("/favicon.ico", include_in_schema=False)
