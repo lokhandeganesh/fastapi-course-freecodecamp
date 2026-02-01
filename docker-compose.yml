@@ -7,6 +7,9 @@ services:
     ports:
       # - <port on localhost>: <>port in container>
       - 9000:9000
+    # # mount the current directory to /usr/src/app in the container for live code reloading
+    volumes:
+      - ./:/usr/src/app
     # # copy environment variables from .env file
     env_file:
       - ./.env
@@ -22,6 +25,9 @@ services:
     #   - ACCESS_TOKEN_EXPIRE_MINUTES=30
     #   - ADMIN_PASS=admin_pass
     #   - DEVELOPER_PASS=developer_pass
+
+    # # command to run the FastAPI application with live reloading
+    command: uv run uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
 
     # # service dependencies
     # depends_on:
