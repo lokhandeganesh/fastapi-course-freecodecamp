@@ -92,7 +92,36 @@ you can find docs of almebic by running
 
 `docker build -t backend:backend .`
 
-`docker run --env-file ./.env -p 8000:8000 --rm backend:backend`
+`docker run -d --env-file ./.env -p 9000:9000 --rm backend:backend`
+
+When to Use
+Use `--rm` for:
+
+Local development
+* Testing images
+* One-off scripts
+* Temporary jobs
+* CI pipelines
+
+Avoid `--rm` for:
+* Production servers
+* Containers with volumes/data
+* Long-running services
+* Debugging crash loops
+
+Best Practice Pattern
+Dev
+`docker run --rm -it backend:backend`
+
+Production
+`docker run -d --restart unless-stopped backend:backend`
+
+Using `docker-compose`
+if you want to up your Dockerfile
+`docker-compose up`
+
+if any changes happen to code of file and you want to rebuild the image
+`docker-compose up --build`
 
 ### Working with Service file to host application
 `sudo systemctl daemon-reload`
