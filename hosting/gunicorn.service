@@ -1,0 +1,41 @@
+[Unit]
+Description=fastapi application
+After=network.target
+
+[Service]
+User=lokhandeganesh
+Group=lokhandeganesh
+WorkingDirectory=/home/lokhandeganesh/fastapi-course-freecodecamp/
+
+# virtual environment path
+Environment="PATH=/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/bin"
+
+# your app config
+EnvironmentFile=/home/lokhandeganesh/fastapi-course-freecodecamp/.env
+
+# systemd-managed runtime dir
+RuntimeDirectory=gunicorn
+RuntimeDirectoryMode=0755
+
+# Calculate workers safely
+ExecStartPre=/bin/bash -c 'echo WORKERS=$(/usr/bin/python3 -c \
+    "import multiprocessing;\
+    print(((min(multiprocessing.cpu_count(), 4)) * 2) + 1)"\
+    ) > /run/gunicorn/workers.env'
+
+# load calculated workers
+EnvironmentFile=-/run/gunicorn/workers.env
+
+# Launch gunicorn with uvicorn workers
+ExecStart=/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/bin/gunicorn \
+  -w ${WORKERS} \
+  -k uvicorn.workers.UvicornWorker \
+  app.main:app \
+  --bind 0.0.0.0:8000
+
+# Restart policy
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

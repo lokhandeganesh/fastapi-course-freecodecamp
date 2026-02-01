@@ -1,0 +1,46 @@
+version: "3"
+services:
+  backend:
+    # # build the Docker image using the Dockerfile in the current directory
+    build: .
+    # # map the port 9000 of the container to port 9000 on localhost
+    ports:
+      # - <port on localhost>: <>port in container>
+      - 9000:9000
+    # # copy environment variables from .env file
+    env_file:
+      - ./.env
+    # # or you can specify environment variables here
+    # environment:
+    #   - DATABASE_HOSTNAME=postgres
+    #   - DATABASE_PORT=5432
+    #   - DATABASE_PASSWORD=password123
+    #   - DATABASE_NAME=fastapi
+    #   - DATABASE_USERNAME=postgres
+    #   - SECRET_KEY=09d25e094faa2556c818166b7a99f6f0f4c3b88e8d3e7
+    #   - ALGORITHM=HS256
+    #   - ACCESS_TOKEN_EXPIRE_MINUTES=30
+    #   - ADMIN_PASS=admin_pass
+    #   - DEVELOPER_PASS=developer_pass
+
+    # # mount the current directory to /usr/src/app in the container for live code reloading
+    # volumes:
+      # - ./:/usr/src/app
+
+    # # command to run the FastAPI application with live reloading
+    # command: uv run uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
+
+    # # service dependencies
+    # depends_on:
+    #   - postgres
+
+#   postgres:
+#     image: postgres
+#     environment:
+#       - POSTGRES_PASSWORD=password123
+#       - POSTGRES_DB=fastapi
+#     volumes:
+#       - postgres-db:/var/lib/postgresql/data
+
+# volumes:
+#   postgres-db:

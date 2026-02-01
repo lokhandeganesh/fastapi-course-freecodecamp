@@ -2,12 +2,14 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
-from .database import Base
+from app.database import Base
 
 
-class Post(Base):
-	__table_args__ = {"schema": "course"}
+class PostJWT(Base):
+	__table_args__ = {"schema": "course_jwt"}
 	__tablename__ = "posts"
 
 	id = Column(Integer, primary_key=True, nullable=False)
@@ -20,23 +22,25 @@ class Post(Base):
 		server_default=text('now()')
 		)
 	owner_id = Column(
-		Integer,
+		UUID(as_uuid=True),
 		ForeignKey(
-			"course.users.id",
+			"course_jwt.users.id",
 			ondelete="CASCADE"),
 		nullable=False
 		)
 
-	owner = relationship("User")
+	owner = relationship("UserJWT")
 
 
-class User(Base):
-	__table_args__ = {"schema": "course"}
+class UserJWT(Base):
+	__table_args__ = {"schema": "course_jwt"}
 	__tablename__ = "users"
 
-	id = Column(Integer, primary_key=True, nullable=False)
+	# id = Column(Integer, primary_key=True, nullable=False)
+	id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
 	email = Column(String, nullable=False, unique=True)
 	password = Column(String, nullable=False)
+	phone_number = Column(String(10), nullable=True)
 	created_at = Column(
 		TIMESTAMP(timezone=True),
 		nullable=False,
@@ -44,21 +48,21 @@ class User(Base):
 		)
 
 
-class Vote(Base):
-	__table_args__ = {"schema": "course"}
+class VoteJWT(Base):
+	__table_args__ = {"schema": "course_jwt"}
 	__tablename__ = "votes"
 
 	user_id = Column(
-		Integer,
+		UUID(as_uuid=True),
 		ForeignKey(
-			"course.users.id",
+			"course_jwt.users.id",
 			ondelete="CASCADE"),
 		primary_key=True
 		)
 	post_id = Column(
 		Integer,
 		ForeignKey(
-			"course.posts.id",
+			"course_jwt.posts.id",
 			ondelete="CASCADE"),
 		primary_key=True
 		)
