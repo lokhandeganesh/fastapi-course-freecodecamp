@@ -27,7 +27,7 @@ ExecStartPre=/bin/bash -c 'echo WORKERS=$(/usr/bin/python3 -c \
 EnvironmentFile=-/run/gunicorn/workers.env
 
 # Launch gunicorn with uvicorn workers
-ExecStart=/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/bin/gunicorn \
+ExecStart=uv run gunicorn \
   -w ${WORKERS} \
   -k uvicorn.workers.UvicornWorker \
   app.main:app \

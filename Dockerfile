@@ -38,7 +38,7 @@ COPY . /usr/src/app
 # Run the application.
 
 # For development use uvicorn
-# CMD ["uv", "run", "uvicorn", "app.main:app", "--port", "9000", "--host", "0.0.0.0"]
+CMD ["uv", "run", "uvicorn", "app.main:app", "--port", "9000", "--host", "0.0.0.0"]
 
 # For production use gunicorn with uvicorn workers
 # CMD ["uv", "run", "gunicorn", "app.main:app", "--bind", "0.0.0.0:9000", "--worker-class", "uvicorn.workers.UvicornWorker"]

@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 
 # from .config import settings
 
-from .routers import post, user, auth, vote, course_pract
+# from .routers import post, user, auth, vote, course_pract
 # routers for course
 from .routers_course import post as course_post, user as course_user, auth as course_auth, vote as course_vote
 
@@ -43,17 +43,17 @@ app.add_middleware(
 	allow_headers=["*"],
 )
 
-app.include_router(course_pract.router)
+# app.include_router(course_pract.router)
 
 app.include_router(course_post.router)
 app.include_router(course_user.router)
 app.include_router(course_vote.router)
 app.include_router(course_auth.router)
 
-app.include_router(post.router)
-app.include_router(user.router)
-app.include_router(auth.router)
-app.include_router(vote.router)
+# app.include_router(post.router)
+# app.include_router(user.router)
+# app.include_router(auth.router)
+# app.include_router(vote.router)
 
 
 # Fetching user database for accessing docs
