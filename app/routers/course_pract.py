@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List
 from fastapi import APIRouter, Response, status, HTTPException
 # from fastapi.params import Body
 from pydantic import BaseModel
