@@ -1,29 +1,24 @@
 server {
-	# replace with specific domain name like sanjeev.com
-	if ($host = api-service.maha.gov.in) {
-		return 301 https://$host$request_uri;
-	} # managed by Certbot
-
-	listen 80;
-	listen [::]:80;
-	server_name _; # you can keep it as it is if your IP is registered as domain name
-    return 404; # managed by Certbot
-}
+	listen 80 default_server;
+	listen [::]:80 default_server;
 
 ##########################################################################
-server {
 	server_name -;
 
-	listen [::]:443 ssl; # managed by Certbot
-	listen 443 ssl; # managed by Certbot	
-	ssl_certificate    /etc/ssl/star_maha_gov_in.crt;
-	ssl_certificate_key  /etc/ssl/star_maha_gov_in.key;
+	# install this service to use below security features
+	# sudo apt install nginx-extras
+
+	# server_tokens off;
+	# more_set_headers "Server: secure";
 
 	location / {
 		resolver              1.1.1.1 ipv6=off;
 		client_max_body_size 30m;
 		proxy_read_timeout 700s;
+
+		# root path to load content
 		root /var/www/html;
+		# Add index.php to the list if you are using PHP
 		index index.html index.htm index.nginx-debian.html;
 
 		proxy_set_header Host $host;
@@ -90,7 +85,7 @@ server {
 		proxy_set_header X-Forwarded-Proto $scheme;
 		proxy_set_header Authorization $http_authorization;
 		proxy_pass_request_headers on;
-	
+
 		################################# Wide-open CORS config for nginx
 
 		if ($request_method = 'OPTIONS') {
