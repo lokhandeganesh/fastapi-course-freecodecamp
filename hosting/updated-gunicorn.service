@@ -10,7 +10,7 @@ WorkingDirectory=/home/lokhandeganesh/fastapi-course-freecodecamp/
 Environment="PATH=/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/bin"
 EnvironmentFile=/home/lokhandeganesh/fastapi-course-freecodecamp/.env
 
-ExecStart=/home/lokhandeganesh/fastapi-course-freecodecamp/.venv/bin/gunicorn \
+ExecStart=uv run gunicorn \
   app.main:app \
   -c hosting/updated-gunicorn.conf.py
 

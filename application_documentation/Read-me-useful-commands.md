@@ -7,17 +7,19 @@
     <img src="https://docs.astral.sh/uv/assets/logo-letter.svg" alt="uv Badge"/>
   </a>
 
-  An extremely fast Python package and project manager
+An extremely fast Python package and project manager
+
 </div>
 
 ### To install uv or check version
+
 `pip install uv`
 
-* then lets check whether its installed properly by printing its version
+- then lets check whether its installed properly by printing its version
 
 `uv --version`
 
-* if you want to add new dependancy library into project, eg. pandas
+- if you want to add new dependancy library into project, eg. pandas
 
 `uv add pandas`
 
@@ -31,6 +33,7 @@ here we will bind our `main.py` which is kept inside of `app` folder to `:app`, 
 this will run our project with `http://localhost:8000`
 
 ### Working with Environment varibale `.env`
+
 We can set the secrete of our project required variable values,
 like Database, Server crediantials
 in our project if we have `.env` file, then we can set all values to systems enviorenment by running
@@ -58,27 +61,27 @@ https://alembic.sqlalchemy.org/en/latest/index.html
 you can find docs of almebic by running
 `uv run alembic --help`
 
-* this command will create new .py file in name of version_number and comment of it which we will use to change db
+- this command will create new .py file in name of version_number and comment of it which we will use to change db
 
 `uv run alembic revision -m "add user table"`
 
-* to check your current version number
-`uv run alembic current`
+- to check your current version number
+  `uv run alembic current`
 
-* to check history of your versions
-`uv run alembic history`
+- to check history of your versions
+  `uv run alembic history`
 
-* to check your current head
-`uv run alembic heads`
+- to check your current head
+  `uv run alembic heads`
 
-* to run the latest revesion
-`uv run alembic upgrade head`
+- to run the latest revesion
+  `uv run alembic upgrade head`
 
-* to run previous version, can simply run commands using numrical value, like `+1, +2 or -1, -2`, where each number represents steps from current version
-`uv run alembic upgrade +1`
+- to run previous version, can simply run commands using numrical value, like `+1, +2 or -1, -2`, where each number represents steps from current version
+  `uv run alembic upgrade +1`
 
-* almebic is intelegent enough to detect your models defination and your current tabel structure in db
-`uv run alembic revision --autogenerate -m "auto-vote"`
+- almebic is intelegent enough to detect your models defination and your current tabel structure in db
+  `uv run alembic revision --autogenerate -m "auto-vote"`
 
 ### Working with Docker
 
@@ -98,16 +101,18 @@ When to Use
 Use `--rm` for:
 
 Local development
-* Testing images
-* One-off scripts
-* Temporary jobs
-* CI pipelines
+
+- Testing images
+- One-off scripts
+- Temporary jobs
+- CI pipelines
 
 Avoid `--rm` for:
-* Production servers
-* Containers with volumes/data
-* Long-running services
-* Debugging crash loops
+
+- Production servers
+- Containers with volumes/data
+- Long-running services
+- Debugging crash loops
 
 Best Practice Pattern
 Dev
@@ -130,6 +135,7 @@ To shutdown and terminate the Docker
 `docker-compose down`
 
 ### Working with Service file to host application
+
 `sudo systemctl daemon-reload`
 
 `sudo systemctl restart fastapi-updated-backend.service`
@@ -148,9 +154,11 @@ If we want to print the `.env` variables loaded on service running
 `cat /run/gunicorn/workers.env`
 
 ### Working with webserver
-#### NGINX
-* High performance webserver that can act as a proxy
-* Can handle SSL termination
+
+**NGINX**
+
+- High performance webserver that can act as a proxy
+- Can handle SSL termination
 
 ![Nginx Server](/application_documentation/image.png)
 
@@ -172,7 +180,7 @@ Active: active (running)
 hide Server header (advanced)
 `sudo apt install nginx-extras`
 
-from project foler in name of  `application_documentation` copy the sample `nginx_fastapi_gunicorn_service.conf` file to the location
+from project foler in name of `application_documentation` copy the sample `nginx_fastapi_gunicorn_service.conf` file to the location
 `/etc/nginx/sites-available` by running
 
 `sudo cp /your-project-file-path/hosting/nginx_fastapi_gunicorn_service.conf .`
@@ -198,44 +206,46 @@ if above command returns
 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 nginx: configuration file /etc/nginx/nginx.conf test is successful
 ```
+
 then it means we are good to go
 
 now lets reload nginx to take effect of our newly created service
 `sudo systemctl reload nginx`
 
-
 your service will be available with proxy name as `http;//your-ip-address/webservice`
 
 #### What to restart when code/config changes
+
 You changed FastAPI application code (.py files)
-* Restart Gunicorn service, NOT nginx.
+
+- Restart Gunicorn service, NOT nginx.
 
 `sudo systemctl restart fastapi.service`
 
 Why?
-* Gunicorn loads your Python code into memory
-* Code changes are NOT picked up automatically in production
-* Nginx just forwards requests — it doesn’t care about Python code
 
+- Gunicorn loads your Python code into memory
+- Code changes are NOT picked up automatically in production
+- Nginx just forwards requests — it doesn’t care about Python code
 
 What NOT to restart
 | Change | Don’t restart |
 |---|---|
-|FastAPI code	|nginx
-|Nginx config	|gunicorn
-|.env values  |nginx
+|FastAPI code |nginx
+|Nginx config |gunicorn
+|.env values |nginx
 
-🧠 Mental model (easy to remember)
+**Mental model (easy to remember)**
 
-* Nginx → traffic cop 🚦
-* Gunicorn → app engine 🚗
-* FastAPI → engine internals 🔧
+- Nginx → traffic cop
+- Gunicorn → app engine
+- FastAPI → engine internals
 
 Change engine internals? → restart engine
 Change traffic rules? → reload traffic cop
 
-* if required
-Log rotation (IMPORTANT)
+- if required
+  Log rotation (IMPORTANT)
 
 Create `/etc/logrotate.d/nginx-fastapi`
 
