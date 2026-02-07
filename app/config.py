@@ -17,6 +17,8 @@ class Settings(BaseSettings):
 
 	class Config:
 		env_file = ".env"
+		# Optional: Instead of adding fields, you can tell Pydantic to ignore extras
+		extra = "ignore"
 
 	@computed_field
 	@property

@@ -6,7 +6,7 @@ services:
     # # map the port 9000 of the container to port 9000 on localhost
     ports:
       # - <port on localhost>: <>port in container>
-      - 9000:9000
+      - ${DEV_DOCKER_PORT}:9000
     # # copy environment variables from .env file
     env_file:
       - ./.env
@@ -14,4 +14,4 @@ services:
     volumes:
       - ./:/usr/src/app
     # # command to run the FastAPI application with live reloading
-    command: uv run uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
+    command: uv run uvicorn app.main:app --host 0.0.0.0 --port ${DEV_DOCKER_PORT} --reload
