@@ -5,7 +5,7 @@ services:
     build: .
     # # map the port 9090 of the container to port 9090 on localhost
     ports:
-      # - <port on localhost>: <>port in container>
+      # - <port on localhost>:<port in container>
       - 9090:9090
     # # copy environment variables from .env file
     env_file:
@@ -18,4 +18,4 @@ services:
       uv run gunicorn app.main:app
       --bind 0.0.0.0:9090
       --worker-class uvicorn.workers.UvicornWorker
-      --workers=$$WORKERS"
+      --workers $$WORKERS"
