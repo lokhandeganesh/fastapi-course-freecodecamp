@@ -262,3 +262,14 @@ Create `/etc/logrotate.d/nginx-fastapi`
   endscript
 }
 ```
+
+### Working with pytest
+using pytest we can check which API's are bracking or working as expected
+
+our test cases are kept in custom folder `using_pytest`, but official documentation recommended that test_files should be kept in folder `test` and nomenclature should be like `test_filename.py`
+
+we can run test using below command
+
+`uv run pytest using_pytest/test_users.py --verbose -s --disable-warnings`
+
+* use `x` flag to stop test at first failed
