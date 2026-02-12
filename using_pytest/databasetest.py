@@ -1,7 +1,13 @@
+from fastapi.testclient import TestClient
 from app.config import settings
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import sessionmaker #, declarative_base
+
+from app.main import app
 from app.database import Base
+from app.database import get_db
+
+import pytest
 
 # SQLALCHEMY_DATABASE_URL = f'postgresql+psycopg://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test'
 # or we can import database_url from settings
@@ -10,7 +16,7 @@ SQLALCHEMY_DATABASE_URL = settings.database_url + "_test"
 engine = create_engine(
 	SQLALCHEMY_DATABASE_URL
 	# ,echo = True # enable logging of SQL queries
-    )
+	)
 
 with engine.begin() as conn:
 	# conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
@@ -19,13 +25,30 @@ with engine.begin() as conn:
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base.metadata.create_all(bind=engine)
-
-print("Database connection to Test databasewas succesfull!")
-
-def override_get_db():
+@pytest.fixture()
+def session():
+	Base.metadata.drop_all(bind=engine)
+	Base.metadata.create_all(bind=engine)
+	print("Database connection to Test databasewas succesfull!")
 	db = TestingSessionLocal()
+	# run our code before we run our tests
 	try:
 		yield db
 	finally:
 		db.close()
+
+@pytest.fixture()
+def client(session):
+	def override_get_db():
+		try:
+			yield session
+		finally:
+			session.close()
+	app.dependency_overrides[get_db] = override_get_db
+	yield TestClient(app)
+
+
+# def test_root(client):
+#     response  = client.get("/")
+#     # print(response.json())
+#     assert response.status_code == 200

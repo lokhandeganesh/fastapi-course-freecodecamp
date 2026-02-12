@@ -1,25 +1,28 @@
-from fastapi.testclient import TestClient
-from app.main import app
+# import pytest
+# from fastapi.testclient import TestClient
+# from app.main import app
 from app.schema import schemas
-from app.database import get_db
-from using_pytest.database_test import override_get_db
+# from app.database import get_db
+# from using_pytest.database_test import override_get_db
+
+# from .databasetest import client, session
 
 # Lets override our get_db dependency to use the testing database instead of the
 # production database for testing purposes.
-app.dependency_overrides[get_db] = override_get_db
+# app.dependency_overrides[get_db] = override_get_db
 
-client = TestClient(app)
+# client = TestClient(app)
 
 # All functionalities of response object can be used here
 # please refer official documentation of response library for more details
 
 
-def test_root():
+def test_root(client):
     response  = client.get("/")
     # print(response.json())
     assert response.status_code == 200
 
-def test_create_user():
+def test_create_user(client):
     response = client.post(
         "/course_users/",
         json={"email": "test@example.com", "password": "testpassword"}
