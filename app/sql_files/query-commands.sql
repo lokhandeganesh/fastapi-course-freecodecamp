@@ -10,3 +10,6 @@ LIMIT 1000;
 SELECT user_id, post_id
     FROM course_jwt.votes
 LIMIT 1000;
+
+DELETE FROM course_jwt.users
+    WHERE id = 'b3c3d0e2-1a4a-409c-b5f4-9bfb04e27e3d'
