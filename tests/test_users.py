@@ -1,6 +1,6 @@
 import pytest
 from jose import jwt
-from app import schemas
+from app.schema import schemas
 
 from app.config import settings
 
@@ -15,7 +15,7 @@ from app.config import settings
 
 def test_create_user(client):
 	res = client.post(
-		"/users/", json={"email": "hello123@gmail.com", "password": "password123"})
+		"/course_users/", json={"email": "hello123@gmail.com", "password": "password123"})
 
 	new_user = schemas.UserOut(**res.json())
 	assert new_user.email == "hello123@gmail.com"
@@ -29,7 +29,7 @@ def test_login_user(test_user, client):
 	payload = jwt.decode(
 		login_res.access_token,
 		settings.secret_key, algorithms=[settings.algorithm])
-	
+
 	id = payload.get("user_id")
 	assert id == test_user['id']
 	assert login_res.token_type == "bearer"
