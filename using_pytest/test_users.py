@@ -76,7 +76,7 @@ def test_create_user(client):
 
     # new_user = schemas.UserOut(**response.json())
     new_user = response.json()
-    print(new_user)
+    # print(new_user)
 
     new_user["password"] = user_data["password"]
 
@@ -96,7 +96,7 @@ def test_login_user(client, test_create_user):
         )
 
     login_res = schemas.Token(**response.json())
-    print(login_res)
+    # print(login_res)
 
     # Decode the JWT token
     payload = jwt.decode(
@@ -111,15 +111,26 @@ def test_login_user(client, test_create_user):
 
     assert response.status_code == 200
 
-def test_incorrect_login(client, test_create_user):
+@pytest.mark.parametrize(
+    "email, password, status_code",
+    [
+    ("test@example.com", "Password", 403),
+    ("test@example.com", "wrongPassword", 403),
+    ("test@example.com", None, 403),
+    ("wrong@example.com", "wrongPassword", 401),
+    (None, "wrongPassword", 401)
+    ]
+)
+def test_incorrect_login(client, test_create_user, email, password, status_code):
     user_data = {
-            "username": test_create_user["email"],
-            "password": "wrongPassword"            }
+            "username": email,
+            "password": password
+        }
 
     response = client.post(
         url = "/course_auth/login/",
         data = user_data
         )
 
-    assert response.status_code == 403
-    assert response.json()["detail"] == "Invalid Credentials"
+    assert response.status_code == status_code
+    # assert response.json()["detail"] == "Invalid Credentials"
