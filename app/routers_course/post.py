@@ -10,7 +10,7 @@ from sqlalchemy import func #, select
 
 from app.model import models
 from app.schema import schemas
-from app.security import oauth
+from app.security import oauth2
 
 from app.logging.logger import logger
 
@@ -71,7 +71,7 @@ async def get_course_posts(db:Session = Depends(get_db), limit:int = 5, skip:int
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model = schemas.PostRetrieve)
 async def create_course_posts(
 	post:schemas.PostBase, db:Session = Depends(get_db),
-	users_data = Depends(oauth.get_current_user)):
+	users_data = Depends(oauth2.get_current_user)):
 
 	# we can access user data from token_data
 	# print(users_data.id)
@@ -94,7 +94,7 @@ async def create_course_posts(
 @router.get("/{id}", response_model = schemas.PostRetrieveOut)
 async def get_course_post(
 	id:int, response: Response, db:Session = Depends(get_db),
-	users_data:str = Depends(oauth.get_current_user)
+	users_data:str = Depends(oauth2.get_current_user)
 	):
 
 	# we can access user data from token_data
@@ -137,7 +137,7 @@ async def get_course_post(
 @router.delete("/{id}", status_code= status.HTTP_204_NO_CONTENT)
 async def delete_course_post(
 	id:int, db:Session = Depends(get_db),
-	users_data:str = Depends(oauth.get_current_user)):
+	users_data:str = Depends(oauth2.get_current_user)):
 
 	# we can access user data from token_data
 	# print(users_data.id)
@@ -178,7 +178,7 @@ async def delete_course_post(
 @router.put("/{id}")
 async def update_course_post(
 	id:int, post:schemas.PostCreate, db:Session = Depends(get_db),
-	users_data:str = Depends(oauth.get_current_user)):
+	users_data:str = Depends(oauth2.get_current_user)):
 
 	# we can access user data from token_data
 	# print(users_data.id)

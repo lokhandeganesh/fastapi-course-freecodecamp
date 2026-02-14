@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.model import models
 from app.schema import schemas
-from app.security import oauth
+from app.security import oauth2
 
 from app.logging.logger import logger
 
@@ -20,7 +20,7 @@ router = APIRouter(
 )
 
 @router.post("/", status_code = status.HTTP_201_CREATED)
-async def vote(vote:schemas.Vote, db:Session = Depends(get_db), users_data:str = Depends(oauth.get_current_user)):
+async def vote(vote:schemas.Vote, db:Session = Depends(get_db), users_data:str = Depends(oauth2.get_current_user)):
 	# lets check if post exists
 	post = db.query(models.PostJWT).filter(models.PostJWT.id == vote.post_id).first()
 	if not post:

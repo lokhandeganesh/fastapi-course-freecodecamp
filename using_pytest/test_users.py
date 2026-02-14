@@ -1,4 +1,7 @@
 import pytest
+import jwt
+import uuid
+
 # from fastapi.testclient import TestClient
 # from app.main import app
 from app.schema import schemas
@@ -17,6 +20,12 @@ from app.schema import schemas
 # please refer official documentation of response library for more details
 
 # from using_pytest.databasetest import client, session
+from app.config import settings
+
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
+
 """
 Automatic Fixture Discovery -
     Pytest automatically finds and loads conftest.py in
@@ -65,9 +74,10 @@ def test_create_user(client):
         url = "/course_users/",
         json = user_data)
 
-    # print(response.json())
     # new_user = schemas.UserOut(**response.json())
     new_user = response.json()
+    print(new_user)
+
     new_user["password"] = user_data["password"]
 
     assert new_user["email"] == "test@example.com"
@@ -85,5 +95,18 @@ def test_login_user(client, test_create_user):
         data = user_data
         )
 
-    # print(response.json())
+    login_res = schemas.Token(**response.json())
+    print(login_res)
+
+    # Decode the JWT token
+    payload = jwt.decode(
+        jwt = login_res.access_token,
+        key = SECRET_KEY,
+        algorithms=[ALGORITHM])
+
+    # Extract the user_id from the payload
+    user_id: uuid.UUID = payload.get("sub")
+    assert user_id == test_create_user["id"]
+    assert login_res.token_type == "bearer"
+
     assert response.status_code == 200
