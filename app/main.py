@@ -20,7 +20,10 @@ from .config import settings
 # from app.db.db_config import settings
 from app.logging.logger import logger
 
-
+"""
+uncomment me and related imports to create table in database, only for first time,
+after that comment me to avoid dropping tables
+"""
 # models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
