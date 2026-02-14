@@ -25,7 +25,17 @@ with engine.begin() as conn:
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-@pytest.fixture(scope="module")
+"""
+The scope of the fixture is depending on how many times you want to run
+the setup and teardwon code, the default one is "function", if you want to
+	run it once
+		* per test function then use scope="function",
+		* per test class then use scope="class",
+		* per test module then use scope="module",
+		* per test session then use scope="session"
+"""
+# @pytest.fixture(scope="module")
+@pytest.fixture()
 def session():
 	Base.metadata.drop_all(bind=engine)
 	Base.metadata.create_all(bind=engine)
@@ -37,7 +47,8 @@ def session():
 	finally:
 		db.close()
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
+@pytest.fixture()
 def client(session):
 	def override_get_db():
 		try:
@@ -46,9 +57,3 @@ def client(session):
 			session.close()
 	app.dependency_overrides[get_db] = override_get_db
 	yield TestClient(app)
-
-
-# def test_root(client):
-#     response  = client.get("/")
-#     # print(response.json())
-#     assert response.status_code == 200
