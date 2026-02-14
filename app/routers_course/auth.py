@@ -12,7 +12,7 @@ from app.schema import schemas
 
 # Implementing Argon2 password hashing
 from app.utils_folder import utils
-from app.security import oauth
+from app.security import oauth2
 
 from app.logging.logger import logger
 
@@ -58,7 +58,7 @@ async def course_login(
 	data = {"sub": str(user.id)}
 
 	# create access token with the data required
-	access_token = oauth.create_access_token(data = data)
+	access_token = oauth2.create_access_token(data = data)
 
 	logger.info(f"User logged in with email: {user_credentials.username}")
 
