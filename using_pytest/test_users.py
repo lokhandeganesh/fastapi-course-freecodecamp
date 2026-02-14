@@ -1,4 +1,4 @@
-# import pytest
+import pytest
 # from fastapi.testclient import TestClient
 # from app.main import app
 from app.schema import schemas
@@ -30,26 +30,60 @@ def test_root(client):
     # print(response.json())
     assert response.status_code == 200
 
+# def test_create_user(client):
+#     response = client.post(
+#         url = "/course_users/",
+#         json = {
+#             "email": "test@example.com",
+#             "password": "testpassword"
+#             })
+
+#     # print(response.json())
+#     new_user = schemas.UserOut(**response.json())
+#     assert new_user.email == "test@example.com"
+#     assert response.status_code == 201
+
+# def test_login_user(client):
+#     response = client.post(
+#         url = "/course_auth/login/",
+#         data = {
+#             "username": "test@example.com",
+#             "password": "testpassword"
+#             })
+
+#     # print(response.json())
+#     assert response.status_code == 200
+
+@pytest.fixture
 def test_create_user(client):
-    response = client.post(
-        url = "/course_users/",
-        json = {
+    user_data = {
             "email": "test@example.com",
             "password": "testpassword"
-            })
+            }
+
+    response = client.post(
+        url = "/course_users/",
+        json = user_data)
 
     # print(response.json())
-    new_user = schemas.UserOut(**response.json())
-    assert new_user.email == "test@example.com"
-    assert response.status_code == 201
+    # new_user = schemas.UserOut(**response.json())
+    new_user = response.json()
+    new_user["password"] = user_data["password"]
 
-def test_login_user(client):
+    assert new_user["email"] == "test@example.com"
+    assert response.status_code == 201
+    return new_user
+
+def test_login_user(client, test_create_user):
+    user_data = {
+            "username": test_create_user["email"],
+            "password": test_create_user["password"]
+            }
+
     response = client.post(
         url = "/course_auth/login/",
-        data = {
-            "username": "test@example.com",
-            "password": "testpassword"
-            })
+        data = user_data
+        )
 
     # print(response.json())
     assert response.status_code == 200
