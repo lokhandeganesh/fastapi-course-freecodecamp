@@ -110,3 +110,16 @@ def test_login_user(client, test_create_user):
     assert login_res.token_type == "bearer"
 
     assert response.status_code == 200
+
+def test_incorrect_login(client, test_create_user):
+    user_data = {
+            "username": test_create_user["email"],
+            "password": "wrongPassword"            }
+
+    response = client.post(
+        url = "/course_auth/login/",
+        data = user_data
+        )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Invalid Credentials"
