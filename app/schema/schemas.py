@@ -2,11 +2,14 @@ from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional
 import uuid
+from datetime import datetime as dt
+
+current_datetime_local = dt.now().isoformat()
 
 class UserOut(BaseModel):
 	id: uuid.UUID
 	email: EmailStr
-	# created_at: datetime
+	# created_at: datetime = current_datetime_local
 
 	class Config:
 		from_attributes = True
@@ -15,7 +18,7 @@ class PostBase(BaseModel):
 	title: str
 	content: str
 	published: bool = True
-	created_at: datetime = None
+	created_at: Optional[datetime] = current_datetime_local
 
 class PostCreateUp(PostBase):
 	# owner_id: uuid.UUID
@@ -77,7 +80,7 @@ class PostCreate(PostBase):
 
 class Post(PostBase):
 	id: int
-	created_at: datetime
+	created_at: datetime = current_datetime_local
 	owner_id: uuid.UUID
 	owner: UserOut
 
