@@ -39,7 +39,7 @@ the setup and teardwon code, the default one is "function", if you want to
 def session():
 	Base.metadata.drop_all(bind=engine)
 	Base.metadata.create_all(bind=engine)
-	print("Database connection to Test databasewas succesfull!")
+	print("Database connection to Test database was succesfull!")
 	db = TestingSessionLocal()
 	# run our code before we run our tests
 	try:

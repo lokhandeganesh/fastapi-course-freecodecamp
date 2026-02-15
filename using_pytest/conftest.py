@@ -2,6 +2,7 @@ from .databasetest import session, client
 import pytest
 from app.security import oauth2
 from app.model import models
+from datetime import datetime
 
 """
     Share Fixtures -
@@ -85,6 +86,16 @@ def test_posts(session, test_create_user, test_create_user2):
         {
             "title" : "second title",
             "content" : "second content",
+            "owner_id" : test_create_user["id"]
+        },
+        {
+            "title" : "third title",
+            "content" : "third content",
+            "owner_id" : test_create_user["id"]
+        },
+        {
+            "title" : "fourth title",
+            "content" : "fourth content",
             "owner_id" : test_create_user2["id"]
         }
     ]
