@@ -39,29 +39,31 @@ def test_root(client):
     # print(response.json())
     assert response.status_code == 200
 
-# def test_create_user(client):
-#     response = client.post(
-#         url = "/course_users/",
-#         json = {
-#             "email": "test@example.com",
-#             "password": "testpassword"
-#             })
+"""
+    # def test_create_user(client):
+    #     response = client.post(
+    #         url = "/course_users/",
+    #         json = {
+    #             "email": "test@example.com",
+    #             "password": "testpassword"
+    #             })
 
-#     # print(response.json())
-#     new_user = schemas.UserOut(**response.json())
-#     assert new_user.email == "test@example.com"
-#     assert response.status_code == 201
+    #     # print(response.json())
+    #     new_user = schemas.UserOut(**response.json())
+    #     assert new_user.email == "test@example.com"
+    #     assert response.status_code == 201
 
-# def test_login_user(client):
-#     response = client.post(
-#         url = "/course_auth/login/",
-#         data = {
-#             "username": "test@example.com",
-#             "password": "testpassword"
-#             })
+    # def test_login_user(client):
+    #     response = client.post(
+    #         url = "/course_auth/login/",
+    #         data = {
+    #             "username": "test@example.com",
+    #             "password": "testpassword"
+    #             })
 
-#     # print(response.json())
-#     assert response.status_code == 200
+    #     # print(response.json())
+    #     assert response.status_code == 200
+"""
 
 @pytest.fixture
 def test_create_user(client):
