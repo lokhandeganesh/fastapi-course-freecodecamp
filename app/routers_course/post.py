@@ -21,7 +21,11 @@ router = APIRouter(
 
 # Connections from sqlalchemy
 @router.get("/", response_model = List[schemas.PostRetrieveOut])
-async def get_course_posts(db:Session = Depends(get_db), limit:int = 5, skip:int = 0, search:Optional[str] = ""):
+async def get_course_posts(
+	db:Session = Depends(get_db),
+	limit:int = 5, skip:int = 0, search:Optional[str] = "",
+	users_data: str = Depends(oauth2.get_current_user)):
+
 	# checking path parameter
 	# print(limit)
 
@@ -70,16 +74,14 @@ async def get_course_posts(db:Session = Depends(get_db), limit:int = 5, skip:int
 # post method to create course.post
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model = schemas.PostRetrieve)
 async def create_course_posts(
-	post:schemas.PostBase, db:Session = Depends(get_db),
-	users_data = Depends(oauth2.get_current_user)):
+	post:schemas.PostCreation, db:Session = Depends(get_db),
+	users_data:str = Depends(oauth2.get_current_user)):
 
 	# we can access user data from token_data
 	# print(users_data.id)
 
 	# print(post.model_dump())
-	new_post = models.PostJWT(
-		**post.model_dump(),
-		owner_id = users_data.id)
+	new_post = models.PostJWT(**post.model_dump())
 
 	# add new_post to session
 	db.add(new_post)
