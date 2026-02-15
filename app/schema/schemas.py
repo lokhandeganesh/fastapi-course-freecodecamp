@@ -54,6 +54,13 @@ class PostRetrieveOut(BaseModel):
 	class Config:
 		from_attributes = True
 
+class PostRetrieveBase(BaseModel):
+	Post: PostBase
+	votes: int
+
+	class Config:
+		from_attributes = True
+
 class PostCreation(PostBase):
 	owner_id: uuid.UUID
 

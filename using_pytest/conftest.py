@@ -58,7 +58,7 @@ def test_create_user2(client):
 def token(test_create_user):
     access_token = oauth2.create_access_token(
         data = {
-            "id" : test_create_user["id"]
+            "sub" : test_create_user["id"]
             }
     )
 
