@@ -2,7 +2,6 @@ from .databasetest import session, client
 import pytest
 from app.security import oauth2
 from app.model import models
-from datetime import datetime
 
 """
     Share Fixtures -
