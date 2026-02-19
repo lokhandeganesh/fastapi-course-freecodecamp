@@ -37,12 +37,9 @@ jobs:
                 image: postgres
                 # Provide the password for postgres
                 env:
-                    # POSTGRES_USER: ${{secrets.DATABASE_USERNAME}}
-                    # POSTGRES_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
-                    # POSTGRES_DB: ${{secrets.DATABASE_NAME}}_test
-                    POSTGRES_USER: pocrapgsql
-                    POSTGRES_PASSWORD: postgres_2023
-                    POSTGRES_DB: pocra_gis_test
+                    POSTGRES_USER: ${{secrets.DATABASE_USERNAME}}
+                    POSTGRES_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
+                    POSTGRES_DB: ${{secrets.DATABASE_NAME}}_test
                 ports:
                     - 5432:5432
                 # Set health checks to wait until postgres has started
@@ -64,7 +61,7 @@ jobs:
             - name: checking python version
               run: |
                 echo "Python version: $(python --version)"
-            - run: echo "🍏 This job's status is ${{ job.status }}."
+            - run: echo "🍏 This job's status is ${{ job.status }}. $(DATABASE_NAME)"
 
             - name: update pip
               run: python -m pip install --upgrade pip
