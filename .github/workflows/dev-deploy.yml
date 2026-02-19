@@ -85,12 +85,12 @@ jobs:
 
             - name: Check PostgesQL Version
               run: |
-                psql -h ${{secrets.DATABASE_HOSTNAME}} -p ${{secrets.DATABASE_PORT}} -U ${{secrets.DATABASE_USERNAME}} -d ${{secrets.DATABASE_NAME}} -c "SELECT version();"
+                psql -h ${{secrets.DATABASE_HOSTNAME}} -p ${{secrets.DATABASE_PORT}} -U ${{secrets.DATABASE_USERNAME}} -c "SELECT version();"
 
             - name: Create database
                 # making sure postgres is up and accepting connections before trying to create the database
               run: |
-                psql -h ${{secrets.DATABASE_HOSTNAME}} -p ${{secrets.DATABASE_PORT}} -U ${{secrets.DATABASE_USERNAME}} -c "SELECT version(); CREATE DATABASE ${{secrets.DATABASE_NAME}}; CREATE DATABASE ${{secrets.DATABASE_NAME}}_test;"
+                psql -h ${{secrets.DATABASE_HOSTNAME}} -p ${{secrets.DATABASE_PORT}} -U ${{secrets.DATABASE_USERNAME}} -c "CREATE DATABASE ${{secrets.DATABASE_NAME}}; CREATE DATABASE ${{secrets.DATABASE_NAME}}_test;"
 
             - name: run tests inside uv environment
               run:
