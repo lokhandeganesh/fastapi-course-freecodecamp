@@ -78,10 +78,11 @@ jobs:
             - name: Setup .pgpass file
               run: |
                 # Format: hostname:port:database:username:password
-                echo "${{secrets.DATABASE_HOSTNAME}}:${{secrets.DATABASE_PORT}}:${{secrets.DATABASE_NAME}}_test:${{secrets.DATABASE_USERNAME}}:${{secrets.DATABASE_PASSWORD}}" > ~/.pgpass
+                echo "${{vars.DATABASE_HOSTNAME}}:${{secrets.DATABASE_PORT}}:${{secrets.DATABASE_NAME}}_test:${{secrets.DATABASE_USERNAME}}:${{secrets.DATABASE_PASSWORD}}" > ~/.pgpass
 
                 # Critical: PostgreSQL ignores the file if permission are too open
                 chmod 600 ~/.pgpass
+                cat ~/.pgpass
 
             - name: Check PostgesQL Version
               run: |
