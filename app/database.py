@@ -12,7 +12,7 @@ from .config import settings
 #     {settings.database_port}/{settings.database_name}"""
 
 # or we can import database_url from settings
-SQLALCHEMY_DATABASE_URL = settings.database_url
+SQLALCHEMY_DATABASE_URL = settings.database_url + "_test"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL
