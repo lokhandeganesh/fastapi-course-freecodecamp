@@ -15,7 +15,7 @@ jobs:
 
         # Set environment variables for the job
         env:
-            DATABASE_HOSTNAME: ${{secrets.DATABASE_HOSTNAME}}
+            DATABASE_HOSTNAME: 127.0.0.1
             DATABASE_PORT: ${{secrets.DATABASE_PORT}}
             DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
             DATABASE_NAME: ${{secrets.DATABASE_NAME}}
@@ -85,12 +85,10 @@ jobs:
 
             - name: Check PostgesQL Version
               run: |
+                echo "DB_USER: ${{secrets.DATABASE_USERNAME}}" >> $GITHUB_STEP_SUMMARY
                 psql -h ${{secrets.DATABASE_HOSTNAME}} -p ${{secrets.DATABASE_PORT}} -U ${{secrets.DATABASE_USERNAME}} -d ${{secrets.DATABASE_NAME}}_test -c "SELECT current_database(), version();"
 
             - name: run tests inside uv environment
               run:
                 # run pytest inside the uv-managed environment
                 uv run pytest -q --disable-warnings
-
-
-
