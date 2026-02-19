@@ -25,11 +25,11 @@ class Settings(BaseSettings):
     @property
     def database_url(self) -> str:
         return "postgresql+psycopg://{user}:{pw}@{host}:{port}/{db}".format(
-            user={self.database_username},
-            pw={self.database_password},
-            host={self.database_hostname},
-            port={self.database_port},
-            db={self.database_name}
+            user=self.database_username,
+            pw=self.database_password,
+            host=self.database_hostname,
+            port=self.database_port,
+            db=self.database_name
             )
 
 
