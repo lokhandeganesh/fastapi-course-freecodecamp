@@ -23,7 +23,11 @@ jobs:
             SECRET_KEY: ${{secrets.SECRET_KEY}}
             ALGORITHM: ${{secrets.ALGORITHM}}
             ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
-            ADMIN_PASS: ${{secrets.ADMIN_PASS}}
+            DOCSHIELD_ADMIN_PASS: ${{secrets.DOCSHIELD_ADMIN_PASS}}
+            DOCSHIELD_DEVELOPER_PASS: ${{secrets.DOCSHIELD_DEVELOPER_PASS}}
+            DOCSHIELD_VIEWER_PASS: ${{secrets.DOCSHIELD_VIEWER_PASS}}
+            DEV_DOCKER_PORT: ${{secrets.DEV_DOCKER_PORT}}
+            PROD_DOCKER_PORT: ${{secrets.PROD_DOCKER_PORT}}
 
         # Service containers to run with `container-job`
         services:
