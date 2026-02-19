@@ -7,7 +7,7 @@ on:
             - "main"
 
 jobs:
-    Deploy-Code:
+    Build-Code:
         runs-on: ubuntu-latest
 
         environment:
@@ -116,15 +116,26 @@ jobs:
                 push: true
                 tags: |
                   ${{ secrets.DOCKERHUB_USERNAME }}/freecodecamp-fastapi:latest
-                  ${{ secrets.DOCKERHUB_USERNAME }}/freecodecamp-fastapi:${{ github.sha}}
+                #   ${{ secrets.DOCKERHUB_USERNAME }}/freecodecamp-fastapi:${{ github.sha}}
                 cache-from: type=gha
                 cache-to: type=gha,mode=max
 
-            - name: Execute remote SSH commands using password
-              uses: appleboy/ssh-action@v1
-              with:
-                host: ${{ secrets.SSH_HOST }}
-                username: ${{ secrets.SSH_USERNAME }}
-                password: ${{ secrets.SSH_PASSWORD }}
-                port: ${{ secrets.SSH_PORT }}
-                script: whoami
+    Deploy-Code:
+        needs: [Build-Code]
+        runs-on: ubuntu-latest
+
+        environment:
+            name: staging
+
+        steps:
+            - name: deploying stuff
+              run: echo "deploying to staging server..."
+
+            # - name: Execute remote SSH commands using password
+            #   uses: appleboy/ssh-action@v1
+            #   with:
+            #     host: ${{ secrets.SSH_HOST }}
+            #     username: ${{ secrets.SSH_USERNAME }}
+            #     password: ${{ secrets.SSH_PASSWORD }}
+            #     port: ${{ secrets.SSH_PORT }}
+            #     script: whoami
