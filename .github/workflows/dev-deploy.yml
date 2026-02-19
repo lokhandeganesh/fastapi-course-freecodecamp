@@ -70,6 +70,14 @@ jobs:
 
             - name: Install psql client
               run: sudo apt-get install -y postgresql-client
+            - name: Setup .pgpass file
+              run: |
+                # Format: hostname:port:database:username:password
+                echo "${{secrets.DATABASE_HOSTNAME}}:${{secrets.DATABASE_PORT}}:${{secrets.DATABASE_NAME}}_test:${{secrets.DATABASE_USERNAME}}:${{secrets.DATABASE_PASSWORD}}" > ~/.pgpass
+
+                # Critical: PostgreSQL ignores the file if permission are too open
+                chmod 600 ~/.pgpass
+
             - name: Check PostgesQL Version
               run: |
                 psql -h ${{secrets.DATABASE_HOSTNAME}} -p ${{secrets.DATABASE_PORT}} -U ${{secrets.DATABASE_USERNAME}} -d ${{secrets.DATABASE_NAME}}_test -c "SELECT version();"
