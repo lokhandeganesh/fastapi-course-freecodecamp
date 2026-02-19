@@ -22,6 +22,6 @@ jobs:
             - run: echo "🍏 This job's status is ${{ job.status }}."
 
 
-        # environment:
-        #     name: staging
+        environment:
+            name: staging
 
