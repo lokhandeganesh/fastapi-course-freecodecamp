@@ -1,0 +1,27 @@
+name: Build and Deploy Dev Code
+on:
+    push:
+        branches: ["dev"]
+    pull_request:
+        branches:
+            - "main"
+
+jobs:
+    Deploy-Code:
+        runs-on: ubuntu-latest
+        steps:
+            - name: pulling git repo
+              uses: actions/checkout@v6
+            - name: Install python version 3.12
+              uses: actions/setup-python@v6
+              with:
+                python-version: "3.12"
+            - name: checking python version
+              run: |
+                echo "Python version: $(python --version)"
+            - run: echo "🍏 This job's status is ${{ job.status }}."
+
+
+        # environment:
+        #     name: staging
+
