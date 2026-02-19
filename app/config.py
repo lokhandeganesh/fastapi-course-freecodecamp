@@ -24,9 +24,9 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def database_url(self) -> str:
-        return f"postgresql+psycopg://{self.database_username}:\
+        return f"""postgresql+psycopg://{self.database_username}:\
             {self.database_password}@{self.database_hostname}:\
-            {self.database_port}/{self.database_name}"
+            {self.database_port}/{self.database_name}"""
 
 
 settings = Settings()
