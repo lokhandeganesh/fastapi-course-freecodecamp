@@ -91,4 +91,4 @@ jobs:
             - name: run tests inside uv environment
               run:
                 # run pytest inside the uv-managed environment
-                uv run pytest -q --disable-warnings
+                uv run pytest -q --disable-warnings -s
