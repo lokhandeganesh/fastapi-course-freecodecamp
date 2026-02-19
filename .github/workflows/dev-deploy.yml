@@ -39,7 +39,7 @@ jobs:
                 env:
                     POSTGRES_USER: pocrapgsql
                     POSTGRES_PASSWORD: postgres_2023
-                    POSTGRES_DB: postgres
+                    POSTGRES_DB: postgres_test
                 ports:
                     - 5432:5432
                 # Set health checks to wait until postgres has started
