@@ -61,7 +61,7 @@ jobs:
             - name: checking python version
               run: |
                 echo "Python version: $(python --version)"
-            - run: echo "🍏 This job's status is ${{ job.status }}. $(DATABASE_NAME)"
+            - run: echo "🍏 This job's status is ${{ job.status }}."
 
             - name: update pip
               run: python -m pip install --upgrade pip
@@ -85,7 +85,7 @@ jobs:
 
             - name: Check PostgesQL Version
               run: |
-                psql -h ${{secrets.DATABASE_HOSTNAME}} -p ${{secrets.DATABASE_PORT}} -U ${{secrets.DATABASE_USERNAME}} -d ${{secrets.DATABASE_NAME}}_test -c "SELECT version();"
+                psql -h ${{secrets.DATABASE_HOSTNAME}} -p ${{secrets.DATABASE_PORT}} -U ${{secrets.DATABASE_USERNAME}} -d ${{secrets.DATABASE_NAME}}_test -c "SELECT current_database(), version();"
 
             - name: run tests inside uv environment
               run:
