@@ -12,22 +12,32 @@ jobs:
         steps:
             - name: pulling git repo
               uses: actions/checkout@v6
+
             - name: Install python version 3.12
               uses: actions/setup-python@v6
               with:
                 python-version: "3.12"
+
             - name: checking python version
               run: |
                 echo "Python version: $(python --version)"
             - run: echo "🍏 This job's status is ${{ job.status }}."
+
             - name: update pip
               run: python -m pip install --upgrade pip
+
             - name: install uv
               run: python -m pip install uv
             - name: sync dependencies with uv
               run: |
                 # create/sync virtualenv according to pyproject.lock / uv config
                 uv sync --frozen --no-cache
+
+            - name: run tests inside uv environment
+              run:
+                # run pytest inside the uv-managed environment
+                uv run pytest -q --disable-warnings
+
 
         environment:
             name: staging
