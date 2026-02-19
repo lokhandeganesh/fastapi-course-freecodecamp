@@ -37,9 +37,12 @@ jobs:
                 image: postgres
                 # Provide the password for postgres
                 env:
-                    POSTGRES_USER: ${{secrets.DATABASE_USERNAME}}
-                    POSTGRES_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
-                    POSTGRES_DB: ${{secrets.DATABASE_NAME}}_test
+                    # POSTGRES_USER: ${{secrets.DATABASE_USERNAME}}
+                    # POSTGRES_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
+                    # POSTGRES_DB: ${{secrets.DATABASE_NAME}}_test
+                    POSTGRES_USER: pocrapgsql
+                    POSTGRES_PASSWORD: postgres_2023
+                    POSTGRES_DB: pocra_gis_test
                 ports:
                     - 5432:5432
                 # Set health checks to wait until postgres has started
