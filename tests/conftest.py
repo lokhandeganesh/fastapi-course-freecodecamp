@@ -20,8 +20,8 @@ def test_create_user(client):
             }
 
     response = client.post(
-        url = "/course_users/",
-        json = user_data)
+        url="/course_users/",
+        json=user_data)
 
     # new_user = schemas.UserOut(**response.json())
     new_user = response.json()
@@ -33,6 +33,7 @@ def test_create_user(client):
     assert response.status_code == 201
     return new_user
 
+
 @pytest.fixture
 def test_create_user2(client):
     user_data = {
@@ -41,8 +42,8 @@ def test_create_user2(client):
             }
 
     response = client.post(
-        url = "/course_users/",
-        json = user_data)
+        url="/course_users/",
+        json=user_data)
 
     # new_user = schemas.UserOut(**response.json())
     new_user = response.json()
@@ -54,16 +55,18 @@ def test_create_user2(client):
     assert response.status_code == 201
     return new_user
 
+
 @pytest.fixture
 def token(test_create_user):
     access_token = oauth2.create_access_token(
-        data = {
-            "sub" : test_create_user["id"]
+        data={
+            "sub": test_create_user["id"]
             }
     )
 
     # print(access_token)
     return access_token
+
 
 @pytest.fixture
 def authorized_client(client, token):
@@ -74,28 +77,29 @@ def authorized_client(client, token):
 
     return client
 
+
 @pytest.fixture
 def test_posts(session, test_create_user, test_create_user2):
     posts_data = [
         {
-            "title" : "first title",
-            "content" : "first content",
-            "owner_id" : test_create_user["id"]
+            "title": "first title",
+            "content": "first content",
+            "owner_id": test_create_user["id"]
         },
         {
-            "title" : "second title",
-            "content" : "second content",
-            "owner_id" : test_create_user["id"]
+            "title": "second title",
+            "content": "second content",
+            "owner_id": test_create_user["id"]
         },
         {
-            "title" : "third title",
-            "content" : "third content",
-            "owner_id" : test_create_user["id"]
+            "title": "third title",
+            "content": "third content",
+            "owner_id": test_create_user["id"]
         },
         {
-            "title" : "fourth title",
-            "content" : "fourth content",
-            "owner_id" : test_create_user2["id"]
+            "title": "fourth title",
+            "content": "fourth content",
+            "owner_id": test_create_user2["id"]
         }
     ]
 
@@ -106,11 +110,17 @@ def test_posts(session, test_create_user, test_create_user2):
     posts = list(posts_map)
 
     session.add_all(posts)
-    # # or you can pass list of posts to add_all method like session.add_all([post1, post2])
+    # # or you can pass list of posts to add_all method like
+    # session.add_all([post1, post2])
+
     # session.add_all(
     #     [
-    #         models.PostJWT( posts_data[0]["title"], posts_data[0]["content"], posts_data[0]["owner_id"]),
-    #         models.PostJWT( posts_data[1]["title"], posts_data[1]["content"], posts_data[1]["owner_id"]),
+    #         models.PostJWT(
+    #             posts_data[0]["title"], posts_data[0]["content"],
+    #             posts_data[0]["owner_id"]),
+    #         models.PostJWT(
+    #             posts_data[1]["title"], posts_data[1]["content"],
+    #             posts_data[1]["owner_id"])
     #     ]
     # )
 
