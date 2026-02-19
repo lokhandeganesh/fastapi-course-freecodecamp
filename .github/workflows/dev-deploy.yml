@@ -20,7 +20,14 @@ jobs:
               run: |
                 echo "Python version: $(python --version)"
             - run: echo "🍏 This job's status is ${{ job.status }}."
-
+            - name: update pip
+              run: python -m pip install --upgrade pip
+            - name: install uv
+              run: python -m pip install uv
+            - name: sync dependencies with uv
+              run: |
+                # create/sync virtualenv according to pyproject.lock / uv config
+                uv sync --frozen --no-cache
 
         environment:
             name: staging
