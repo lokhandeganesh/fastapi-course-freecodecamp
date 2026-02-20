@@ -138,6 +138,10 @@ jobs:
           sudo apt update && sudo apt upgrade -y
           sudo apt install network-manager-fortisslvpn-gnome -y
 
+      - name: Connect to VPN
+        run: |
+          sudo openfortivpn ${{ secrets.VPN_IP }}:${{ secrets.VPN_PORT }} --username=${{ secrets.VPN_USERNAME }} --password=${{ secrets.VPN_PASS }}
+
       #   - name: fortclient-vpn
       #     uses: myusp/connect-forticlient-vpn@main
       #     with:
