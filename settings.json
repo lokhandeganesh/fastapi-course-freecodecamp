@@ -4696,7 +4696,7 @@
   // Configure settings to be overridden for the yaml language.
   "[yaml]": {
     "editor.insertSpaces": true,
-    "editor.tabSize": 4,
+    "editor.tabSize": 2,
     "editor.autoIndent": false,
     "editor.quickSuggestions": {
       "other": true,
@@ -5514,7 +5514,7 @@
   "prettier.singleQuote": false,
 
   // Number of spaces it should use per tab
-  "prettier.tabWidth": 4,
+  "prettier.tabWidth": 2,
 
   // Controls the printing of trailing commas wherever possible. Valid options:
   // - `none` - No trailing commas
