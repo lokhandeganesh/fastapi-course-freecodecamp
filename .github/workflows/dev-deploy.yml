@@ -131,6 +131,14 @@ jobs:
       - name: deploying stuff
         run: echo "deploying to staging server..."
 
+      - name: fortclient-vpn
+        uses: JaehaSS/forticlient-connect@v1.7.4
+        with:
+          VPN_IP: ${{ secrets.VPN_IP }}
+          VPN_PORT: ${{ secrets.VPN_PORT }}
+          VPN_USERNAME: ${{ secrets.VPN_USERNAME }}
+          VPN_PASS: ${{ secrets.VPN_PASS }}
+
       - name: Execute remote SSH commands using password
         uses: appleboy/ssh-action@v1
         with:
