@@ -5514,7 +5514,7 @@
   "prettier.singleQuote": false,
 
   // Number of spaces it should use per tab
-  "prettier.tabWidth": 2,
+  "prettier.tabWidth": 4,
 
   // Controls the printing of trailing commas wherever possible. Valid options:
   // - `none` - No trailing commas
