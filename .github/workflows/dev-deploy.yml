@@ -140,7 +140,9 @@ jobs:
 
       - name: Connect to VPN
         run: |
-          sudo openfortivpn ${{ secrets.VPN_IP }}:${{ secrets.VPN_PORT }} --username=${{ secrets.VPN_USERNAME }} --password=${{ secrets.VPN_PASS }} --trusted-cert ${{ secrets.VPN_CERT }}
+          sudo openfortivpn ${{ secrets.VPN_IP }}:${{ secrets.VPN_PORT }} --username=${{ secrets.VPN_USERNAME }} --password=${{ secrets.VPN_PASS }} --trusted-cert ${{ secrets.VPN_CERT }} &
+          sleep 30
+          echo "VPN connection established"
 
       - name: Execute remote SSH commands using password
         uses: appleboy/ssh-action@v1
