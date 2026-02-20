@@ -122,6 +122,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   Deploy-Code:
+    # if: false
     # needs: [Build-Code]
     runs-on: ubuntu-latest
     # runs-on: ubuntu-22.04
@@ -151,4 +152,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          script: whoami
+          script: |
+            echo "connected to remote server"
+            ls ~
