@@ -8,6 +8,7 @@ on:
 
 jobs:
   Build-Code:
+    if: false
     runs-on: ubuntu-latest
 
     environment:
@@ -121,7 +122,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   Deploy-Code:
-    needs: [Build-Code]
+    # needs: [Build-Code]
     runs-on: ubuntu-latest
 
     environment:
@@ -132,12 +133,19 @@ jobs:
         run: echo "deploying to staging server..."
 
       - name: fortclient-vpn
-        uses: JaehaSS/forticlient-connect@v1.7.4
+        uses: myusp/connect-forticlient-vpn@main
         with:
-          VPN_IP: ${{ secrets.VPN_IP }}
-          VPN_PORT: ${{ secrets.VPN_PORT }}
-          VPN_USERNAME: ${{ secrets.VPN_USERNAME }}
-          VPN_PASS: ${{ secrets.VPN_PASS }}
+          vpn_ip: ${{ secrets.VPN_IP }}
+          vpn_port: ${{ secrets.VPN_PORT }}
+          vpn_username: ${{ secrets.VPN_USERNAME }}
+          vpn_password: ${{ secrets.VPN_PASS }}
+
+        # uses: JaehaSS/forticlient-connect@v1.7.4
+        # with:
+        #   VPN_IP: ${{ secrets.VPN_IP }}
+        #   VPN_PORT: ${{ secrets.VPN_PORT }}
+        #   VPN_USERNAME: ${{ secrets.VPN_USERNAME }}
+        #   VPN_PASS: ${{ secrets.VPN_PASS }}
 
       - name: Execute remote SSH commands using password
         uses: appleboy/ssh-action@v1
