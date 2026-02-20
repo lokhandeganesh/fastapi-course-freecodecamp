@@ -135,7 +135,8 @@ jobs:
 
       - name: Installing OpenclientVPN
         run: |
-          apt install network-manager-fortisslvpn-gnome
+          sudo apt update && apt upgrade
+          sudo apt install network-manager-fortisslvpn-gnome -y
 
       #   - name: fortclient-vpn
       #     uses: myusp/connect-forticlient-vpn@main
