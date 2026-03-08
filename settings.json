@@ -6310,8 +6310,14 @@
   // Whether to lint Python files.
   "python.linting.enabled": true,
 
+  "flake8.args": [
+        "--max-line-length=120"
+    ],
+
   // Arguments passed in. Each argument is a separate item in the array.
-  "python.linting.flake8Args": [],
+  "python.linting.flake8Args": [
+    "--max-line-length=120"
+  ],
 
   // Severity of Flake8 message type 'E'.
   "python.linting.flake8CategorySeverity.E": "Error",
@@ -6323,7 +6329,7 @@
   "python.linting.flake8CategorySeverity.W": "Warning",
 
   // Whether to lint Python files using flake8.
-  "python.linting.flake8Enabled": false,
+  "python.linting.flake8Enabled": true,
 
   // Path to flake8, you can use a custom version of flake8 by modifying this setting to include the full path.
   "python.linting.flake8Path": "flake8",
