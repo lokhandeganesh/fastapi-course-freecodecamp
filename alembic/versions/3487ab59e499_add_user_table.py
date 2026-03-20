@@ -17,6 +17,7 @@ down_revision: Union[str, Sequence[str], None] = '275038d8d2ec'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+
 def upgrade() -> None:
     """Upgrade schema."""
     op.create_table(
@@ -28,10 +29,10 @@ def upgrade() -> None:
         # sa.ForeignKeyConstraint(['owner_id'], ['users.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('email'),
-        schema='course_jwt'
+        schema='course'
     )
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table('users', schema='course_jwt')
+    op.drop_table('users', schema='course')

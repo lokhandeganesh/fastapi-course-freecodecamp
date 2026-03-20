@@ -1,0 +1,157 @@
+name: Build and Deploy Dev Code
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  Build-Code:
+    if: false
+    runs-on: ubuntu-latest
+
+    environment:
+      name: staging
+
+    # Set environment variables for the job
+    env:
+      DATABASE_HOSTNAME: ${{secrets.DATABASE_HOSTNAME}}
+      DATABASE_PORT: ${{secrets.DATABASE_PORT}}
+      DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
+      DATABASE_NAME: ${{secrets.DATABASE_NAME}}
+      DATABASE_USERNAME: ${{secrets.DATABASE_USERNAME}}
+      SECRET_KEY: ${{secrets.SECRET_KEY}}
+      ALGORITHM: ${{secrets.ALGORITHM}}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
+      DOCSHIELD_ADMIN_PASS: ${{secrets.DOCSHIELD_ADMIN_PASS}}
+      DOCSHIELD_DEVELOPER_PASS: ${{secrets.DOCSHIELD_DEVELOPER_PASS}}
+      DOCSHIELD_VIEWER_PASS: ${{secrets.DOCSHIELD_VIEWER_PASS}}
+      DEV_DOCKER_PORT: ${{secrets.DEV_DOCKER_PORT}}
+      PROD_DOCKER_PORT: ${{secrets.PROD_DOCKER_PORT}}
+
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_USER: ${{secrets.DATABASE_USERNAME}}
+          POSTGRES_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: pulling git repo
+        uses: actions/checkout@v6
+
+      - name: Install python version 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: checking python version
+        run: |
+          echo "Python version: $(python --version)"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: update pip
+        run: python -m pip install --upgrade pip
+
+      - name: install uv
+        run: python -m pip install uv
+      - name: sync dependencies with uv
+        run: |
+          # create/sync virtualenv according to pyproject.lock / uv config
+          uv sync --frozen --no-cache
+
+      - name: Install psql client
+        run: sudo apt-get install -y postgresql-client
+      - name: Setup .pgpass file
+        run: |
+          # Format: hostname:port:database:username:password
+          echo "${{secrets.DATABASE_HOSTNAME}}:${{secrets.DATABASE_PORT}}:*:${{secrets.DATABASE_USERNAME}}:${{secrets.DATABASE_PASSWORD}}" > ~/.pgpass
+
+          # Critical: PostgreSQL ignores the file if permission are too open
+          chmod 600 ~/.pgpass
+
+      - name: Check PostgesQL Version
+        run: |
+          psql -h ${{secrets.DATABASE_HOSTNAME}} -p ${{secrets.DATABASE_PORT}} -U ${{secrets.DATABASE_USERNAME}} -d postgres -c "SELECT version();"
+
+      - name:
+          Create database
+          # making sure postgres is up and accepting connections before trying to create the database
+        run: |
+          psql -h ${{secrets.DATABASE_HOSTNAME}} -p ${{secrets.DATABASE_PORT}} -U ${{secrets.DATABASE_USERNAME}} -d postgres -c "CREATE DATABASE ${{secrets.DATABASE_NAME}};" -c "CREATE DATABASE ${{secrets.DATABASE_NAME}}_test;"
+
+      - name: run tests inside uv environment
+        run:
+          # run pytest inside the uv-managed environment
+          uv run pytest -q --disable-warnings -s
+
+      # Deploy to staging server using SSH
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/freecodecamp-fastapi:latest
+          #   ${{ secrets.DOCKERHUB_USERNAME }}/freecodecamp-fastapi:${{ github.sha}}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  Deploy-Code:
+    # if: false
+    # needs: [Build-Code]
+    runs-on: ubuntu-latest
+    # runs-on: ubuntu-22.04
+
+    environment:
+      name: staging
+
+    steps:
+      - name: deploying stuff
+        run: echo "deploying to staging server..."
+
+      - name: Installing OpenclientVPN
+        run: |
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install network-manager-fortisslvpn-gnome -y
+
+      - name: Connect to VPN
+        run: |
+          sudo openfortivpn ${{ secrets.VPN_IP }}:${{ secrets.VPN_PORT }} --username=${{ secrets.VPN_USERNAME }} --password=${{ secrets.VPN_PASS }} --trusted-cert ${{ secrets.VPN_CERT }} &
+          sleep 30
+          echo "VPN connection established"
+
+      - name: Execute remote SSH commands using password
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            echo "connected to remote server"
+            ls ~

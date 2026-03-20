@@ -5,64 +5,64 @@ from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
-from app.database import Base
+from app.db_files.database import Base
 
 
 class PostJWT(Base):
-	__table_args__ = {"schema": "course_jwt"}
-	__tablename__ = "posts"
+    __table_args__ = {"schema": "course"}
+    __tablename__ = "posts"
 
-	id = Column(Integer, primary_key=True, nullable=False)
-	title = Column(String, nullable=False)
-	content = Column(String, nullable=False)
-	published = Column(Boolean, server_default='TRUE', nullable=False)
-	created_at = Column(
-		TIMESTAMP(timezone=True),
-		nullable=False,
-		server_default=text('now()')
-		)
-	owner_id = Column(
-		UUID(as_uuid=True),
-		ForeignKey(
-			"course_jwt.users.id",
-			ondelete="CASCADE"),
-		nullable=False
-		)
+    id = Column(Integer, primary_key=True, nullable=False)
+    title = Column(String, nullable=False)
+    content = Column(String, nullable=False)
+    published = Column(Boolean, server_default='TRUE', nullable=False)
+    created_at = Column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=text('now()')
+        )
+    owner_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey(
+            "course.users.id",
+            ondelete="CASCADE"),
+        nullable=False
+        )
 
-	owner = relationship("UserJWT")
+    owner = relationship("UserJWT")
 
 
 class UserJWT(Base):
-	__table_args__ = {"schema": "course_jwt"}
-	__tablename__ = "users"
+    __table_args__ = {"schema": "course"}
+    __tablename__ = "users"
 
-	# id = Column(Integer, primary_key=True, nullable=False)
-	id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
-	email = Column(String, nullable=False, unique=True)
-	password = Column(String, nullable=False)
-	phone_number = Column(String(10), nullable=True)
-	created_at = Column(
-		TIMESTAMP(timezone=True),
-		nullable=False,
-		server_default=text('now()')
-		)
+    # id = Column(Integer, primary_key=True, nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
+    email = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)
+    phone_number = Column(String(10), nullable=True)
+    created_at = Column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=text('now()')
+        )
 
 
 class VoteJWT(Base):
-	__table_args__ = {"schema": "course_jwt"}
-	__tablename__ = "votes"
+    __table_args__ = {"schema": "course"}
+    __tablename__ = "votes"
 
-	user_id = Column(
-		UUID(as_uuid=True),
-		ForeignKey(
-			"course_jwt.users.id",
-			ondelete="CASCADE"),
-		primary_key=True
-		)
-	post_id = Column(
-		Integer,
-		ForeignKey(
-			"course_jwt.posts.id",
-			ondelete="CASCADE"),
-		primary_key=True
-		)
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey(
+            "course.users.id",
+            ondelete="CASCADE"),
+        primary_key=True
+        )
+    post_id = Column(
+        Integer,
+        ForeignKey(
+            "course.posts.id",
+            ondelete="CASCADE"),
+        primary_key=True
+        )

@@ -1,132 +1,131 @@
-from fastapi.testclient import TestClient
+from .databasetest import session, client
 import pytest
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, declarative_base
-from app.main import app
+from app.security import oauth2
+from app.model import models
 
-from app.config import settings
-from app.database import get_db
-from app.database import Base
-from app.oauth2 import create_access_token
-from app import models
-from alembic import command
-
-
-# SQLALCHEMY_DATABASE_URL = 'postgresql://postgres:password123@localhost:5432/fastapi_test'
-SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test'
-
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-
-with engine.begin() as conn:
-	conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
-
-TestingSessionLocal = sessionmaker(
-	autocommit=False, autoflush=False, bind=engine)
-
-
-@pytest.fixture()
-def session():
-	print("my session fixture ran")
-	Base.metadata.drop_all(bind=engine)
-	Base.metadata.create_all(bind=engine)
-	db = TestingSessionLocal()
-
-	try:
-		yield db
-	finally:
-		db.close()
-
-
-@pytest.fixture()
-def client(session):
-	def override_get_db():
-		try:
-			yield session
-		finally:
-			session.close()
-	app.dependency_overrides[get_db] = override_get_db
-	yield TestClient(app)
+"""
+    Share Fixtures -
+    Any fixtures defined in conftest.py are available
+    to all test
+    files in that directory and any subdirectories.
+"""
+__all__ = ["session", "client"]
 
 
 @pytest.fixture
-def test_user2(client):
-	user_data = {
-		"email": "sanjeev123@gmail.com",
-		"password": "password123"
-		}
+def test_create_user(client):
+    user_data = {
+            "email": "test@example.com",
+            "password": "testpassword"
+            }
 
-	res = client.post("/users/", json=user_data)
+    response = client.post(
+        url="/course_users/",
+        json=user_data)
 
-	assert res.status_code == 201
+    # new_user = schemas.UserOut(**response.json())
+    new_user = response.json()
+    # print(new_user)
 
-	new_user = res.json()
-	new_user['password'] = user_data['password']
-	return new_user
+    new_user["password"] = user_data["password"]
 
-
-@pytest.fixture
-def test_user(client):
-	user_data = {
-		"email": "sanjeev@gmail.com",
-		"password": "password123"
-		}
-
-	res = client.post("/users/", json=user_data)
-
-	assert res.status_code == 201
-
-	new_user = res.json()
-	new_user['password'] = user_data['password']
-	return new_user
+    assert new_user["email"] == "test@example.com"
+    assert response.status_code == 201
+    return new_user
 
 
 @pytest.fixture
-def token(test_user):
-	return create_access_token({"user_id": test_user['id']})
+def test_create_user2(client):
+    user_data = {
+            "email": "test2@example.com",
+            "password": "test2password"
+            }
+
+    response = client.post(
+        url="/course_users/",
+        json=user_data)
+
+    # new_user = schemas.UserOut(**response.json())
+    new_user = response.json()
+    # print(new_user)
+
+    new_user["password"] = user_data["password"]
+
+    assert new_user["email"] == "test2@example.com"
+    assert response.status_code == 201
+    return new_user
+
+
+@pytest.fixture
+def token(test_create_user):
+    access_token = oauth2.create_access_token(
+        data={
+            "sub": test_create_user["id"]
+            }
+    )
+
+    # print(access_token)
+    return access_token
 
 
 @pytest.fixture
 def authorized_client(client, token):
-	client.headers = {
-		**client.headers,
-		"Authorization": f"Bearer {token}"
-	}
+    client.headers = {
+        **client.headers,
+        "Authorization": f"Bearer {token}"
+    }
 
-	return client
+    return client
 
 
 @pytest.fixture
-def test_posts(test_user, session, test_user2):
-	posts_data = [{
-		"title": "first title",
-		"content": "first content",
-		"owner_id": test_user['id']
-	}, {
-		"title": "2nd title",
-		"content": "2nd content",
-		"owner_id": test_user['id']
-	},
-		{
-		"title": "3rd title",
-		"content": "3rd content",
-		"owner_id": test_user['id']
-	}, {
-		"title": "3rd title",
-		"content": "3rd content",
-		"owner_id": test_user2['id']
-	}]
+def test_posts(session, test_create_user, test_create_user2):
+    posts_data = [
+        {
+            "title": "first title",
+            "content": "first content",
+            "owner_id": test_create_user["id"]
+        },
+        {
+            "title": "second title",
+            "content": "second content",
+            "owner_id": test_create_user["id"]
+        },
+        {
+            "title": "third title",
+            "content": "third content",
+            "owner_id": test_create_user["id"]
+        },
+        {
+            "title": "fourth title",
+            "content": "fourth content",
+            "owner_id": test_create_user2["id"]
+        }
+    ]
 
-	def create_post_model(post):
-		return models.Post(**post)
+    def create_post_model(post):
+        return models.PostJWT(**post)
 
-	post_map = map(create_post_model, posts_data)
-	posts = list(post_map)
+    posts_map = map(create_post_model, posts_data)
+    posts = list(posts_map)
 
-	session.add_all(posts)
-	# session.add_all([models.Post(title="first title", content="first content", owner_id=test_user['id']),
-	#                 models.Post(title="2nd title", content="2nd content", owner_id=test_user['id']), models.Post(title="3rd title", content="3rd content", owner_id=test_user['id'])])
-	session.commit()
+    session.add_all(posts)
+    # # or you can pass list of posts to add_all method like
+    # session.add_all([post1, post2])
 
-	posts = session.query(models.Post).all()
-	return posts
+    # session.add_all(
+    #     [
+    #         models.PostJWT(
+    #             posts_data[0]["title"], posts_data[0]["content"],
+    #             posts_data[0]["owner_id"]),
+    #         models.PostJWT(
+    #             posts_data[1]["title"], posts_data[1]["content"],
+    #             posts_data[1]["owner_id"])
+    #     ]
+    # )
+
+    session.commit()
+
+    posts = session.query(models.PostJWT).all()
+    # print(posts)
+    return posts
