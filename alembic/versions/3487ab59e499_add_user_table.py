@@ -29,10 +29,10 @@ def upgrade() -> None:
         # sa.ForeignKeyConstraint(['owner_id'], ['users.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('email'),
-        schema='course_jwt'
+        schema='course'
     )
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table('users', schema='course_jwt')
+    op.drop_table('users', schema='course')

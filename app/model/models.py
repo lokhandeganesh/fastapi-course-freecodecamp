@@ -5,11 +5,11 @@ from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
-from app.database import Base
+from app.db_files.database import Base
 
 
 class PostJWT(Base):
-    __table_args__ = {"schema": "course_jwt"}
+    __table_args__ = {"schema": "course"}
     __tablename__ = "posts"
 
     id = Column(Integer, primary_key=True, nullable=False)
@@ -24,7 +24,7 @@ class PostJWT(Base):
     owner_id = Column(
         UUID(as_uuid=True),
         ForeignKey(
-            "course_jwt.users.id",
+            "course.users.id",
             ondelete="CASCADE"),
         nullable=False
         )
@@ -33,7 +33,7 @@ class PostJWT(Base):
 
 
 class UserJWT(Base):
-    __table_args__ = {"schema": "course_jwt"}
+    __table_args__ = {"schema": "course"}
     __tablename__ = "users"
 
     # id = Column(Integer, primary_key=True, nullable=False)
@@ -49,20 +49,20 @@ class UserJWT(Base):
 
 
 class VoteJWT(Base):
-    __table_args__ = {"schema": "course_jwt"}
+    __table_args__ = {"schema": "course"}
     __tablename__ = "votes"
 
     user_id = Column(
         UUID(as_uuid=True),
         ForeignKey(
-            "course_jwt.users.id",
+            "course.users.id",
             ondelete="CASCADE"),
         primary_key=True
         )
     post_id = Column(
         Integer,
         ForeignKey(
-            "course_jwt.posts.id",
+            "course.posts.id",
             ondelete="CASCADE"),
         primary_key=True
         )

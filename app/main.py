@@ -2,8 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-# from . import models
-
 # need to import models to create tables, moved to separate folder
 # from .model import models
 
@@ -11,13 +9,11 @@ from fastapi.responses import FileResponse
 
 # from .config import settings
 
-# from .routers import post, user, auth, vote, course_pract
 # routers for course
-from .routers_course import post as course_post, user as course_user, \
-    auth as course_auth, vote as course_vote
+from app.routers import post, user, auth, vote
 
 from fastapi_docshield import DocShield
-from .config import settings
+from app.db_files.config import settings
 # from app.db.db_config import settings
 from app.logging.logger import logger
 
@@ -47,10 +43,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(course_post.router)
-app.include_router(course_user.router)
-app.include_router(course_vote.router)
-app.include_router(course_auth.router)
+app.include_router(post.router)
+app.include_router(user.router)
+app.include_router(vote.router)
+app.include_router(auth.router)
 
 
 # Fetching user database for accessing docs

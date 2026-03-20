@@ -5,7 +5,7 @@ from jwt import PyJWTError
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 
-from app.config import settings
+from app.db_files.config import settings
 from app.schema import schemas
 
 import uuid

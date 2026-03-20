@@ -1,31 +1,63 @@
-from fastapi import APIRouter, Depends, status, HTTPException
-from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+from fastapi import APIRouter, status, HTTPException
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordRequestForm
+
+
+# Sqlalchemy imports
+from app.db_files.database import get_db
 from sqlalchemy.orm import Session
 
-from .. import database, schemas, models, utils, oauth2
+from app.model import models
+from app.schema import schemas
 
-router = APIRouter(tags=['Authentication'])
+# Implementing Argon2 password hashing
+from app.utils_folder import utils
+from app.security import oauth2
+
+from app.logging.logger import logger
+
+router = APIRouter(
+    prefix="/course_auth",
+    tags=['Course Authentication']
+)
 
 
-@router.post('/login', response_model=schemas.Token)
-def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
+# (Authentication routes can be added here in the future)
+@router.post("/login", response_model=schemas.Token)
+async def course_login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # then request form will return data in the form of
+    #  {
+    #   "username": "string",
+    #   "password": "string"
+    #  }
 
-	user = db.query(models.User).filter(
-		models.User.email == user_credentials.username).first()
+    # query the database to find user by email
+    user = db.query(models.UserJWT).filter(
+        models.UserJWT.email == user_credentials.username
+        ).first()
 
-	if not user:
-		raise HTTPException(
-			status_code=status.HTTP_403_FORBIDDEN,
-			detail="Invalid Credentials")
+    if not user:
+        logger.warning(f"User Account does not exist: {user_credentials.username}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Credentials"
+        )
 
-	if not utils.verify(user_credentials.password, user.password):
-		raise HTTPException(
-			status_code=status.HTTP_403_FORBIDDEN,
-			detail="Invalid Credentials")
+    # check if password matches
+    if not utils.verify_password(user.password, user_credentials.password):
+        logger.warning(f"Login failed for email: {user_credentials.username}")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid Credentials"
+        )
 
-	# create a token
-	# return token
+    # Creating a JWT token
+    # data that we want to include in the token
+    data = {"sub": str(user.id)}
 
-	access_token = oauth2.create_access_token(data={"user_id": user.id})
+    # create access token with the data required
+    access_token = oauth2.create_access_token(data=data)
 
-	return {"access_token": access_token, "token_type": "bearer"}
+    logger.info(f"User logged in with email: {user_credentials.username}")
+
+    return {"access_token": access_token, "token_type": "bearer"}

@@ -1,6 +1,6 @@
 from functools import lru_cache
 from psycopg_pool import AsyncConnectionPool
-from app.db.db_config import settings
+from app.db_improved.db_config import settings
 
 conninfo = f"""user={settings.database_username}\
     password={settings.database_password}\

@@ -1,11 +1,11 @@
 from fastapi.testclient import TestClient
-from app.config import settings
+from app.db_files.config import settings
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker  # , declarative_base
 
 from app.main import app
-from app.database import Base
-from app.database import get_db
+from app.db_files.database import Base
+from app.db_files.database import get_db
 
 import pytest
 
@@ -25,7 +25,7 @@ engine = create_engine(
 
 with engine.begin() as conn:
     # conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
-    conn.execute(text("CREATE SCHEMA IF NOT EXISTS course_jwt"))
+    conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
 
 
 TestingSessionLocal = sessionmaker(

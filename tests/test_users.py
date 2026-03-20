@@ -20,7 +20,7 @@ from app.schema import schemas
 # please refer official documentation of response library for more details
 
 # from using_pytest.databasetest import client, session
-from app.config import settings
+from app.db_files.config import settings
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm

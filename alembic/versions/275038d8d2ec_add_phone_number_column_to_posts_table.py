@@ -23,7 +23,7 @@ def upgrade() -> None:
     op.add_column(
         'users',
         sa.Column('phone_number', sa.String(10), nullable=True),
-        schema='course_jwt'
+        schema='course'
         )
 
 
@@ -32,5 +32,5 @@ def downgrade() -> None:
     op.drop_column(
         'users',
         'phone_number',
-        schema='course_jwt'
+        schema='course'
         )

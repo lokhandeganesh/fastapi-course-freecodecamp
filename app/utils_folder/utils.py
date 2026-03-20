@@ -1,7 +1,7 @@
 import argon2
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, InvalidHash
-from app.logger import logger
+from app.logging.logger import logger
 
 
 # Complete hashing function with parameters
@@ -30,6 +30,16 @@ def hash_password(password):
 
 
 # Complete verification function
+# # Example usage
+# password = "super_secret_password"
+# hash_result = hash_password(password)
+# print(f"Hashed password: {hash_result}")
+
+# # This will produce something like:
+# # $argon2id$v=19$m=102400,t=2,p=8$RTRrSEl2MTNpSnZ3ZmFpNg$wxJjHFEQpJXsLFO+T5xzHJGkUqJkL7SYgvUB4GQqKyQ
+# # Which includes the algorithm, version, parameters, salt, and hash
+
+
 def verify_password(stored_hash, provided_password):
     # Create the hasher
     ph = PasswordHasher()
@@ -47,3 +57,11 @@ def verify_password(stored_hash, provided_password):
         logger.error("Invalid hash format. The hash may be corrupted.")
         # print("Invalid hash format. The hash may be corrupted.")
         return False
+
+# # Example usage
+# stored_hash = "$argon2id$v=19$m=102400,t=2,p=8$RTRrSEl2MTNpSnZ3ZmFpNg$wxJjHFEQpJXsLFO+T5xzHJGkUqJkL7SYgvUB4GQqKyQ"
+# is_valid = verify_password(stored_hash, "super_secret_password")
+# if is_valid:
+#     print("Password is correct!")
+# else:
+#     print("Password is incorrect!")

@@ -1,122 +1,222 @@
-from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Response, status, HTTPException
+from fastapi import Depends
 from typing import List, Optional
+# import uuid
 
-from sqlalchemy import func
-# from sqlalchemy.sql.functions import func
-from .. import models, schemas, oauth2
-from ..database import get_db
+# Sqlalchemy imports
+from app.db_files.database import get_db
+from sqlalchemy.orm import Session, aliased
+from sqlalchemy import func  # , select
 
+from app.model import models
+from app.schema import schemas
+from app.security import oauth2
+
+from app.logging.logger import logger
 
 router = APIRouter(
-	prefix="/posts",
-	tags=['Posts']
+    prefix="/course_posts",
+    tags=['Course Posts']
 )
 
 
-# @router.get("/", response_model=List[schemas.Post])
-@router.get("/", response_model=List[schemas.PostOut])
-def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
-	# results = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
-	#     models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id)
+# Connections from sqlalchemy
+@router.get("/", response_model=List[schemas.PostRetrieveOut])
+async def get_course_posts(
+  db: Session = Depends(get_db),
+  limit: int = 5, skip: int = 0, search: Optional[str] = "",
+  users_data: str = Depends(oauth2.get_current_user)):
 
-	# cursor.execute("""SELECT * FROM posts """)
-	# posts = cursor.fetchall()
+    # checking path parameter
+    # print(limit)
 
-	# posts = db.execute(
-	#     'select posts.*, COUNT(votes.post_id) as votes from posts LEFT JOIN votes ON posts.id=votes.post_id  group by posts.id')
-	# results = []
-	# for post in posts:
-	#     results.append(dict(post))
-	# print(results)
-	# posts = db.query(models.Post).filter(
-	#     models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    # query to get all posts
+    # posts = db.query(models.PostJWT).all()
 
-	posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
-		models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
-	return posts
+    # limiting number of posts returned
+    # posts = db.query(models.PostJWT).filter(
+    # 			models.PostJWT.title.contains(search)
+    # 		).order_by(
+    # 				models.PostJWT.id
+    # 			).limit(limit).offset(skip).all()
 
+    # to load only specific columns
+    # stmt = select(
+    # 	models.PostJWT.id,
+    # 	models.PostJWT.title,
+    # 	models.PostJWT.content,
+    # 	models.PostJWT.published,
+    # 	models.PostJWT.owner_id
+    # 	)
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
-def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-	# cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """,
-	#                (post.title, post.content, post.published))
-	# new_post = cursor.fetchone()
+    # posts = db.execute(stmt).mappings().all()
 
-	# conn.commit()
+    # performing joins of posts and votes
+    # We need to use aliasing because ORM and Pydantic have trouble
+    # handling models with the schema output name conflicts
+    PostAlias = aliased(models.PostJWT, name="Post")
 
-	new_post = models.Post(owner_id=current_user.id, **post.dict())
-	db.add(new_post)
-	db.commit()
-	db.refresh(new_post)
+    posts = db.query(
+        PostAlias,
+        func.count(models.VoteJWT.post_id).label("votes")
+        ).join(
+            models.VoteJWT,
+            models.VoteJWT.post_id == PostAlias.id,
+            isouter=True
+            ).group_by(
+                PostAlias.id
+                ).filter(
+                    PostAlias.title.contains(search)
+                    ).limit(limit).offset(skip).all()
 
-	return new_post
-
-
-@router.get("/{id}", response_model=schemas.PostOut)
-def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-	# cursor.execute("""SELECT * from posts WHERE id = %s """, (str(id),))
-	# post = cursor.fetchone()
-	# post = db.query(models.Post).filter(models.Post.id == id).first()
-
-	post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
-		models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
-
-	if not post:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-							detail=f"post with id: {id} was not found")
-
-	return post
+    # return [{"Post": post, "votes": votes} for post, votes in posts]
+    return posts
 
 
+# post method to create course.post
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostRetrieve)
+async def create_course_posts(
+  post: schemas.PostCreation, db: Session = Depends(get_db),
+  users_data: str = Depends(oauth2.get_current_user)):
+
+    # we can access user data from token_data
+    # print(users_data.id)
+
+    # print(post.model_dump())
+    new_post = models.PostJWT(**post.model_dump())
+
+    # add new_post to session
+    db.add(new_post)
+    # commit the changes to database
+    db.commit()
+    # refresh the new_post object to get updated data from database
+    db.refresh(new_post)
+
+    return new_post
+
+
+# to retrive post from posts
+@router.get("/{id}", response_model=schemas.PostRetrieveOut)
+async def get_course_post(
+  id: int, response: Response, db: Session = Depends(get_db),
+  users_data: str = Depends(oauth2.get_current_user)):
+
+    # we can access user data from token_data
+    # print(users_data.id)
+
+    # query to get post by id
+    PostAlias = aliased(models.PostJWT, name="Post")
+    # post = db.query(models.PostJWT).filter(models.PostJWT.id == id).first()
+
+    post = db.query(
+            PostAlias,
+            func.count(models.VoteJWT.post_id).label("votes")
+            ).join(
+                models.VoteJWT,
+                models.VoteJWT.post_id == PostAlias.id,
+                isouter=True
+                ).filter(
+                    PostAlias.id == id
+                    ).group_by(
+                        PostAlias.id
+                        ).first()
+
+    try:
+        if not post:
+            logger.info(f"post with id:{id} not found.")
+
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"post with id:{id} not found."
+                )
+        return post
+    except HTTPException:
+        # Let FastAPI handle HTTPException (like 404)
+        raise
+    except Exception as e:
+        # Log the exception for debugging
+        logger.exception(f"Unhandled error: {e}")
+
+
+# to delete post from course.posts table
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+async def delete_course_post(
+  id: int, db: Session = Depends(get_db),
+  users_data: str = Depends(oauth2.get_current_user)):
 
-	# cursor.execute(
-	#     """DELETE FROM posts WHERE id = %s returning *""", (str(id),))
-	# deleted_post = cursor.fetchone()
-	# conn.commit()
-	post_query = db.query(models.Post).filter(models.Post.id == id)
+    # we can access user data from token_data
+    # print(users_data.id)
 
-	post = post_query.first()
+    # query to delete post by id
+    post_query = db.query(models.PostJWT).filter(models.PostJWT.id == id)
 
-	if post == None:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-							detail=f"post with id: {id} does not exist")
+    # retrive the post for deleting
+    post = post_query.first()
 
-	if post.owner_id != current_user.id:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-							detail="Not authorized to perform requested action")
+    if not post:
+        logger.info(f"post with id:{id} not found.")
 
-	post_query.delete(synchronize_session=False)
-	db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"post with id:{id} not found."
+        )
 
-	return Response(status_code=status.HTTP_204_NO_CONTENT)
+    # we will chekk if the user is the owner of the post before deleting
+    if not post.owner_id == users_data.id:
+        logger.info(f"user is not owner of post with id:{id}.")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to perform requested action."
+        )
+
+    # delete the post
+    post_query.delete(synchronize_session=False)
+
+    # commit the changes to database
+    db.commit()
+
+    logger.info(f"post with id:{id} deleted.")
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.put("/{id}", response_model=schemas.Post)
-def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+# to update post from course.posts table
+@router.put("/{id}")
+async def update_course_post(
+  id: int, post: schemas.PostCreate, db: Session = Depends(get_db),
+  users_data: str = Depends(oauth2.get_current_user)):
 
-	# cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
-	#                (post.title, post.content, post.published, str(id)))
+    # we can access user data from token_data
+    # print(users_data.id)
 
-	# updated_post = cursor.fetchone()
-	# conn.commit()
+    # query to update post by id
+    post_query = db.query(models.PostJWT).filter(models.PostJWT.id == id)
 
-	post_query = db.query(models.Post).filter(models.Post.id == id)
+    # retrive the post for updating
+    updated_post = post_query.first()
 
-	post = post_query.first()
+    # using index of in posts
+    if not updated_post:
+        logger.info(f"post with id:{id} not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"post with id:{id} not found."
+        )
 
-	if post == None:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-							detail=f"post with id: {id} does not exist")
+    # we will chekk if the user is the owner of the post before updating
+    if not updated_post.owner_id == users_data.id:
+        logger.info(f"user is not owner of post with id:{id}.")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to perform requested action."
+        )
 
-	if post.owner_id != current_user.id:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-							detail="Not authorized to perform requested action")
+    # update the post
+    post_query.update(post.model_dump(), synchronize_session=False)
 
-	post_query.update(updated_post.dict(), synchronize_session=False)
+    # commit the changes to database
+    db.commit()
 
-	db.commit()
+    logger.info(f"post with id:{id} updated.")
 
-	return post_query.first()
+    return post_query.first()

@@ -23,7 +23,7 @@ def upgrade() -> None:
     op.add_column(
         'posts',
         sa.Column('owner_id', sa.UUID(as_uuid=True), nullable=False),
-        schema='course_jwt'
+        schema='course'
         )
     op.create_foreign_key(
         constraint_name='posts_owner_id_fkey',
@@ -31,8 +31,8 @@ def upgrade() -> None:
         referent_table='users',
         local_cols=['owner_id'],
         remote_cols=['id'],
-        source_schema='course_jwt',
-        referent_schema='course_jwt',
+        source_schema='course',
+        referent_schema='course',
         ondelete='CASCADE'
         )
 
@@ -42,11 +42,11 @@ def downgrade() -> None:
     op.drop_constraint(
         constraint_name='posts_owner_id_fkey',
         table_name='posts',
-        schema='course_jwt',
+        schema='course',
         type_='foreignkey'
         )
     op.drop_column(
         table_name='posts',
         column_name='owner_id',
-        schema='course_jwt'
+        schema='course'
         )
