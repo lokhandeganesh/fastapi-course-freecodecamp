@@ -47,17 +47,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.include_router(course_pract.router)
-
 app.include_router(course_post.router)
 app.include_router(course_user.router)
 app.include_router(course_vote.router)
 app.include_router(course_auth.router)
-
-# app.include_router(post.router)
-# app.include_router(user.router)
-# app.include_router(auth.router)
-# app.include_router(vote.router)
 
 
 # Fetching user database for accessing docs

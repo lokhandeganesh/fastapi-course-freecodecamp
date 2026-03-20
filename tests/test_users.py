@@ -35,9 +35,10 @@ conftest.py
 
 
 def test_root(client):
-    response  = client.get(url = "/")
+    response = client.get(url="/")
     # print(response.json())
     assert response.status_code == 200
+
 
 """
     # def test_create_user(client):
@@ -65,6 +66,7 @@ def test_root(client):
     #     assert response.status_code == 200
 """
 
+
 @pytest.fixture
 def test_create_user(client):
     user_data = {
@@ -73,8 +75,8 @@ def test_create_user(client):
             }
 
     response = client.post(
-        url = "/course_users/",
-        json = user_data)
+        url="/course_users/",
+        json=user_data)
 
     # new_user = schemas.UserOut(**response.json())
     new_user = response.json()
@@ -86,6 +88,7 @@ def test_create_user(client):
     assert response.status_code == 201
     return new_user
 
+
 def test_login_user(client, test_create_user):
     user_data = {
             "username": test_create_user["email"],
@@ -93,8 +96,8 @@ def test_login_user(client, test_create_user):
             }
 
     response = client.post(
-        url = "/course_auth/login/",
-        data = user_data
+        url="/course_auth/login/",
+        data=user_data
         )
 
     login_res = schemas.Token(**response.json())
@@ -102,8 +105,8 @@ def test_login_user(client, test_create_user):
 
     # Decode the JWT token
     payload = jwt.decode(
-        jwt = login_res.access_token,
-        key = SECRET_KEY,
+        jwt=login_res.access_token,
+        key=SECRET_KEY,
         algorithms=[ALGORITHM])
 
     # Extract the user_id from the payload
@@ -113,14 +116,15 @@ def test_login_user(client, test_create_user):
 
     assert response.status_code == 200
 
+
 @pytest.mark.parametrize(
     "email, password, status_code",
     [
-    ("test@example.com", "Password", 403),
-    ("test@example.com", "wrongPassword", 403),
-    ("test@example.com", None, 403),
-    ("wrong@example.com", "wrongPassword", 401),
-    (None, "wrongPassword", 401)
+        ("test@example.com", "Password", 403),
+        ("test@example.com", "wrongPassword", 403),
+        ("test@example.com", None, 403),
+        ("wrong@example.com", "wrongPassword", 401),
+        (None, "wrongPassword", 401)
     ]
 )
 def test_incorrect_login(client, test_create_user, email, password, status_code):
@@ -130,8 +134,8 @@ def test_incorrect_login(client, test_create_user, email, password, status_code)
         }
 
     response = client.post(
-        url = "/course_auth/login/",
-        data = user_data
+        url="/course_auth/login/",
+        data=user_data
         )
 
     assert response.status_code == status_code

@@ -14,55 +14,57 @@ from app.schema import schemas
 from app.utils_folder import utils
 
 router = APIRouter(
-	prefix="/course_users",
-	tags=['Course Users']
+    prefix="/course_users",
+    tags=['Course Users']
 )
 
+
 # User Authentication and Authorization
-@router.post("/", status_code = status.HTTP_201_CREATED, response_model = schemas.UserOut)
-async def create_course_users(user:schemas.UserCreate, db:Session = Depends(get_db)):
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+async def create_course_users(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
-	# hash the password - user.password
-	hashed_password = utils.hash_password(user.password)
-	# update the user.password with hashed password
-	user.password = hashed_password
+    # hash the password - user.password
+    hashed_password = utils.hash_password(user.password)
+    # update the user.password with hashed password
+    user.password = hashed_password
 
-	new_user = models.UserJWT(**user.model_dump())
+    new_user = models.UserJWT(**user.model_dump())
 
-	# add new_post to session
-	db.add(new_user)
+    # add new_post to session
+    db.add(new_user)
 
-	try:
-		# commit the changes to database
-		db.commit()
-		# refresh the new_user object to get created in the database
-		db.refresh(new_user)
+    try:
+        # commit the changes to database
+        db.commit()
+        # refresh the new_user object to get created in the database
+        db.refresh(new_user)
 
-		return new_user
+        return new_user
 
-	except IntegrityError as e:
-		db.rollback()
-		logger.error(f"IntegrityError: {e.orig}")
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"IntegrityError: {e.orig}")
 
-		if "users_email_key" in str(e.orig):
-			raise HTTPException(
-				status_code=status.HTTP_409_CONFLICT,
-				detail="User with this email already exists."
-			)
+        if "users_email_key" in str(e.orig):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="User with this email already exists."
+            )
 
-		raise HTTPException(
-			status_code=status.HTTP_400_BAD_REQUEST,
-			detail="Could not create user due to data constraint"
-		)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Could not create user due to data constraint"
+        )
+
 
 @router.get("/{id}", response_model=schemas.UserOut)
-def get_course_user(id:int, db:Session = Depends(get_db)):
-	user  = db.query(models.UserJWT).filter(models.UserJWT.id ==id).first()
+def get_course_user(id: int, db: Session = Depends(get_db)):
+    user = db.query(models.UserJWT).filter(models.UserJWT.id == id).first()
 
-	if not user:
-		raise HTTPException(
-			status_code=status.HTTP_404_NOT_FOUND,
-			detail=f"User with id:{id} does not exist."
-		)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id:{id} does not exist."
+        )
 
-	return user
+    return user
