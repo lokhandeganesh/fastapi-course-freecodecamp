@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 # Sqlalchemy imports
 from app.db_files.database import get_db
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.model import models
 from app.schema import schemas
@@ -24,7 +25,7 @@ router = APIRouter(
 
 # (Authentication routes can be added here in the future)
 @router.post("/login", response_model=schemas.Token)
-async def course_login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def course_login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     # then request form will return data in the form of
     #  {
     #   "username": "string",

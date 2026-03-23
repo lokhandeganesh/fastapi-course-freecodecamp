@@ -1,7 +1,7 @@
 [project]
 name = "fastapi-course"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.1.1"
+description = "A modern FastAPI application with SQLAlchemy 2.0 and AsyncPG for high-performance async database operations. Features include JWT authentication with Redis token storage, password hashing, connection pooling"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -11,6 +11,7 @@ dependencies = [
     "argon2-cffi>=25.1.0",
     "async-exit-stack>=1.0.1",
     "async-generator>=1.10",
+    "asyncpg>=0.31.0",
     "autopep8>=2.3.2",
     "bcrypt>=4.3.0",
     "certifi>=2025.8.3",
@@ -41,8 +42,6 @@ dependencies = [
     "orjson>=3.11.3",
     "passlib>=1.7.4",
     "promise>=2.3",
-    "psycopg>=3.2.13",
-    "psycopg-pool>=3.2.8",
     "pyasn1>=0.6.1",
     "pycodestyle>=2.14.0",
     "pycparser>=2.22",
@@ -57,6 +56,7 @@ dependencies = [
     "python-jose>=3.5.0",
     "python-multipart>=0.0.20",
     "pyyaml>=6.0.2",
+    "redis>=7.3.0",
     "requests>=2.32.5",
     "rsa>=4.9.1",
     "ruff>=0.12.12",

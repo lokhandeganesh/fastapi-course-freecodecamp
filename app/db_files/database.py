@@ -1,18 +1,29 @@
-from sqlalchemy import create_engine, text
+from collections.abc import AsyncGenerator
+from fastapi.exceptions import ResponseValidationError
+# import asyncio
+
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
 from app.db_files.config import settings
+from app.logging.logger import logger
 
-# or we can import database_url from settings
-SQLALCHEMY_DATABASE_URL = settings.database_url
-# print(SQLALCHEMY_DATABASE_URL)
+engine = create_async_engine(
+    settings.asyncpg_url.unicode_string(),
+    future=True,
+    echo=True,
+)
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL
-    # ,echo = True # enable logging of SQL queries
-    )
-
-with engine.begin() as conn:
-    conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
+# expire_on_commit=False will prevent attributes from being expired
+# after commit.
+AsyncSessionFactory = async_sessionmaker(
+    bind=engine,
+    autocommit=False,
+    autoflush=False,
+    expire_on_commit=False,
+)
 
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -22,9 +33,24 @@ Base = declarative_base()
 print("Database connection was succesfull!")
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Dependency
+async def get_db() -> AsyncGenerator:
+    async with AsyncSessionFactory() as session:
+        try:
+            yield session
+            await session.commit()
+        except SQLAlchemyError:
+            # Re-raise SQLAlchemy errors to be handled by the global handler
+            raise
+        except Exception as ex:
+            # Only log actual database-related issues, not response validation
+            if not isinstance(ex, ResponseValidationError):
+                logger.error(f"Database-related error: {repr(ex)}")
+            raise  # Re-raise to be handled by appropriate handlers
+
+# async def setup_db():
+#     async with engine.begin() as conn:
+#         await conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
+
+# if __name__ == "__main__":
+#     asyncio.run(setup_db())
