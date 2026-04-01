@@ -8,9 +8,17 @@ class Settings(BaseSettings):
     database_password: str
     database_name: str
     database_username: str
+
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
+
+    redis_host: str
+    redis_port: int
+    redis_password: str
+    redis_decode_response: bool
+    redis_db: int
+
     docshield_admin_pass: str
     docshield_developer_pass: str
     docshield_viewer_pass: str
@@ -31,6 +39,12 @@ class Settings(BaseSettings):
             port=self.database_port,
             db=self.database_name
             )
+
+    @computed_field
+    @property
+    def redis_url(self) -> str:
+        # redis://:password@host:port/db
+        return f"redis://:{self.redis_password}@{self.redis_host}:{self.redis_port}/{self.redis_db}"
 
 
 settings = Settings()

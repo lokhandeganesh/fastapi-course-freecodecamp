@@ -23,6 +23,7 @@ from contextlib import asynccontextmanager
 
 from app.db_files.database import engine
 # from app.model.models import Base
+from app.db_files.redis import init_redis, close_redis
 
 """
 uncomment me and related imports to create table in database,
@@ -33,21 +34,36 @@ only for first time, after that comment me to avoid dropping tables
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # RUNS ONCE ON STARTUP
-    # async with engine.begin() as conn:
-    #     # Create the schema
-    #     await conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
+    # Initialize Optional Redis
+    try:
+        await init_redis()
+        logger.info("Redis connection established successfully.")
+    except Exception as e:
+        logger.warning(f"Optional Redis service is unavailable: {e}")
 
-    #     # Create the tables (Async version of create_all)
-    #     await conn.run_sync(Base.metadata.create_all)
+    # # Database Schema & Table Initialization
+    # try:
+    #     async with engine.begin() as conn:
+    #         # Create the schema first
+    #         await conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
 
-    # logger.info("Schema 'course' and tables verified/created.")
+    #         # Create tables within that schema
+    #         # run_sync bridges the gap between Async engine and Sync Base.metadata
+    #         await conn.run_sync(Base.metadata.create_all)
+
+    #     logger.info("Database schema 'course' and tables verified/created.")
+    # except Exception as e:
+    #     logger.error(f"Database initialization failed: {e}")
+    #     # In production, you might want to raise this so the app doesn't start broken
+    #     raise e
 
     yield  # The app runs here
 
-    # RUNS ONCE ON SHUTDOWN
+    # Shutdown & Cleanup
+    await close_redis()
     await engine.dispose()
-    logger.info("Database engine disposed.")
+    logger.info("Cleanup complete: Redis closed and DB engine disposed.")
+
 
 app = FastAPI(
     lifespan=lifespan,
