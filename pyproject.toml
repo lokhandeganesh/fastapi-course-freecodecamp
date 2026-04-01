@@ -5,7 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "orjson>=3.11.8",
     "psycopg>=3.3.3",
+    "pydantic-geojson>=0.3.2",
 ]
 [tool.flake8]
 max-line-length = 120

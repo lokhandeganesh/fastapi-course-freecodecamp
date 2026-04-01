@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.middleware.gzip import GZipMiddleware
 
 # need to import models to create tables, moved to separate folder
 # from .model import models
@@ -8,9 +9,6 @@ from fastapi.responses import FileResponse
 # from .database import engine
 
 # from .config import settings
-
-# routers for course
-from app.routers import post, user, auth, vote
 
 from fastapi_docshield import DocShield
 from app.db_files.config import settings
@@ -24,6 +22,10 @@ from contextlib import asynccontextmanager
 from app.db_files.database import engine
 # from app.model.models import Base
 from app.db_files.redis import init_redis, close_redis
+
+# routers for course
+from app.routers import post, user, auth, vote
+from app.routers import drop_down_module
 
 """
 uncomment me and related imports to create table in database,
@@ -77,6 +79,9 @@ app = FastAPI(
 
 origins = ["*"]
 
+# Add Gzip compression for any response larger than 1KB
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -89,6 +94,8 @@ app.include_router(post.router)
 app.include_router(user.router)
 app.include_router(vote.router)
 app.include_router(auth.router)
+# External routers
+app.include_router(drop_down_module.router)
 
 
 # Fetching user database for accessing docs
