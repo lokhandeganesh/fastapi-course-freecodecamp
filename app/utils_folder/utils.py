@@ -3,29 +3,28 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, InvalidHash
 from app.logging.logger import logger
 
+# Define the parameters once at the top level
+# Configure the algorithm
+# time_cost = 2          # Number of iterations
+# memory_cost = 102400   # 100 MB in KiB
+# parallelism = 8        # Number of parallel threads
+# hash_len = 32          # Length of the hash in bytes
+# salt_len = 16          # Length of the salt in bytes
+
+HASHER = PasswordHasher(
+    time_cost=2,
+    memory_cost=102400,
+    parallelism=8,
+    hash_len=32,
+    salt_len=16,
+    type=argon2.Type.ID
+)
+
 
 # Complete hashing function with parameters
-def hash_password(password):
-    # Configure the algorithm
-    time_cost = 2          # Number of iterations
-    memory_cost = 102400   # 100 MB in KiB
-    parallelism = 8        # Number of parallel threads
-    hash_len = 32          # Length of the hash in bytes
-    salt_len = 16          # Length of the salt in bytes
-
-    # Create the hasher
-    ph = argon2.PasswordHasher(
-        time_cost=time_cost,
-        memory_cost=memory_cost,
-        parallelism=parallelism,
-        hash_len=hash_len,
-        salt_len=salt_len,
-        type=argon2.Type.ID  # Using Argon2id variant
-    )
-
+def hash_password(password: str) -> str:
     # Hash the password (salt is generated automatically)
-    hash = ph.hash(password)
-
+    hash = HASHER.hash(password)
     return hash
 
 
@@ -41,13 +40,10 @@ def hash_password(password):
 
 
 def verify_password(stored_hash, provided_password):
-    # Create the hasher
-    ph = PasswordHasher()
-
     try:
         # The verify method returns True if the password matches
         # It raises an exception if the password doesn't match
-        ph.verify(stored_hash, provided_password)
+        HASHER.verify(stored_hash, provided_password)
         return True
     except VerifyMismatchError:
         # Password doesn't match

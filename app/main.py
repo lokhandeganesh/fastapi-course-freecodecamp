@@ -15,7 +15,14 @@ from app.routers import post, user, auth, vote
 from fastapi_docshield import DocShield
 from app.db_files.config import settings
 # from app.db.db_config import settings
+
 from app.logging.logger import logger
+
+from contextlib import asynccontextmanager
+# from sqlalchemy import text
+
+from app.db_files.database import engine
+# from app.model.models import Base
 
 """
 uncomment me and related imports to create table in database,
@@ -23,8 +30,27 @@ only for first time, after that comment me to avoid dropping tables
 """
 # models.Base.metadata.create_all(bind=engine)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # RUNS ONCE ON STARTUP
+    # async with engine.begin() as conn:
+    #     # Create the schema
+    #     await conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
+
+    #     # Create the tables (Async version of create_all)
+    #     await conn.run_sync(Base.metadata.create_all)
+
+    # logger.info("Schema 'course' and tables verified/created.")
+
+    yield  # The app runs here
+
+    # RUNS ONCE ON SHUTDOWN
+    await engine.dispose()
+    logger.info("Database engine disposed.")
+
 app = FastAPI(
-    # lifespan=lifespan,
+    lifespan=lifespan,
     root_path="/webservice",
     docs_url="/webservice/docs",
     redoc_url=None,

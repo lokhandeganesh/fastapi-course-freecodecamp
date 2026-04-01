@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 # Sqlalchemy imports
 from app.db_files.database import get_db
-from sqlalchemy.orm import Session
+# from sqlalchemy.orm import Session
 
 from app.model import models
 from app.schema import schemas
@@ -16,6 +16,9 @@ from app.security import oauth2
 
 from app.logging.logger import logger
 
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 router = APIRouter(
     prefix="/course_auth",
     tags=['Course Authentication']
@@ -24,7 +27,7 @@ router = APIRouter(
 
 # (Authentication routes can be added here in the future)
 @router.post("/login", response_model=schemas.Token)
-async def course_login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def course_login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     # then request form will return data in the form of
     #  {
     #   "username": "string",
@@ -32,9 +35,13 @@ async def course_login(user_credentials: OAuth2PasswordRequestForm = Depends(), 
     #  }
 
     # query the database to find user by email
-    user = db.query(models.UserJWT).filter(
-        models.UserJWT.email == user_credentials.username
-        ).first()
+    # Querying database
+    query = select(models.UserJWT).where(models.UserJWT.email == user_credentials.username)
+
+    # Await the execution
+    result = await db.execute(query)
+
+    user = result.scalars().first()
 
     if not user:
         logger.warning(f"User Account does not exist: {user_credentials.username}")

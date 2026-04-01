@@ -5,8 +5,14 @@ from typing import List, Optional
 
 # Sqlalchemy imports
 from app.db_files.database import get_db
-from sqlalchemy.orm import Session, aliased
-from sqlalchemy import func  # , select
+from sqlalchemy.orm import aliased, selectinload
+# from sqlalchemy.orm import Session, aliased, selectinload
+
+# from sqlalchemy import func  # , select
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
+# from sqlalchemy import select, func, update, delete
 
 from app.model import models
 from app.schema import schemas
@@ -23,51 +29,29 @@ router = APIRouter(
 # Connections from sqlalchemy
 @router.get("/", response_model=List[schemas.PostRetrieveOut])
 async def get_course_posts(
-  db: Session = Depends(get_db),
+  db: AsyncSession = Depends(get_db),
   limit: int = 5, skip: int = 0, search: Optional[str] = "",
   users_data: str = Depends(oauth2.get_current_user)):
-
-    # checking path parameter
-    # print(limit)
-
-    # query to get all posts
-    # posts = db.query(models.PostJWT).all()
-
-    # limiting number of posts returned
-    # posts = db.query(models.PostJWT).filter(
-    # 			models.PostJWT.title.contains(search)
-    # 		).order_by(
-    # 				models.PostJWT.id
-    # 			).limit(limit).offset(skip).all()
-
-    # to load only specific columns
-    # stmt = select(
-    # 	models.PostJWT.id,
-    # 	models.PostJWT.title,
-    # 	models.PostJWT.content,
-    # 	models.PostJWT.published,
-    # 	models.PostJWT.owner_id
-    # 	)
-
-    # posts = db.execute(stmt).mappings().all()
+    # we can access user data from token_data
+    # print(users_data.id)
 
     # performing joins of posts and votes
     # We need to use aliasing because ORM and Pydantic have trouble
     # handling models with the schema output name conflicts
     PostAlias = aliased(models.PostJWT, name="Post")
 
-    posts = db.query(
-        PostAlias,
-        func.count(models.VoteJWT.post_id).label("votes")
-        ).join(
-            models.VoteJWT,
-            models.VoteJWT.post_id == PostAlias.id,
-            isouter=True
-            ).group_by(
-                PostAlias.id
-                ).filter(
-                    PostAlias.title.contains(search)
-                    ).limit(limit).offset(skip).all()
+    query = (
+        select(PostAlias, func.count(models.VoteJWT.post_id).label("votes"))
+        .options(selectinload(PostAlias.owner))
+        .join(models.VoteJWT, models.VoteJWT.post_id == PostAlias.id, isouter=True)
+        .group_by(PostAlias.id)
+        .filter(PostAlias.title.contains(search))
+        .limit(limit)
+        .offset(skip)
+    )
+
+    result = await db.execute(query)
+    posts = result.mappings().all()
 
     # return [{"Post": post, "votes": votes} for post, votes in posts]
     return posts
@@ -76,7 +60,7 @@ async def get_course_posts(
 # post method to create course.post
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostRetrieve)
 async def create_course_posts(
-  post: schemas.PostCreation, db: Session = Depends(get_db),
+  post: schemas.PostCreation, db: AsyncSession = Depends(get_db),
   users_data: str = Depends(oauth2.get_current_user)):
 
     # we can access user data from token_data
@@ -88,9 +72,9 @@ async def create_course_posts(
     # add new_post to session
     db.add(new_post)
     # commit the changes to database
-    db.commit()
+    await db.commit()
     # refresh the new_post object to get updated data from database
-    db.refresh(new_post)
+    await db.refresh(new_post)
 
     return new_post
 
@@ -98,28 +82,26 @@ async def create_course_posts(
 # to retrive post from posts
 @router.get("/{id}", response_model=schemas.PostRetrieveOut)
 async def get_course_post(
-  id: int, response: Response, db: Session = Depends(get_db),
+  id: int, response: Response, db: AsyncSession = Depends(get_db),
   users_data: str = Depends(oauth2.get_current_user)):
 
     # we can access user data from token_data
-    # print(users_data.id)
+    # print(users_data.id, users_data.email)
 
     # query to get post by id
     PostAlias = aliased(models.PostJWT, name="Post")
     # post = db.query(models.PostJWT).filter(models.PostJWT.id == id).first()
 
-    post = db.query(
-            PostAlias,
-            func.count(models.VoteJWT.post_id).label("votes")
-            ).join(
-                models.VoteJWT,
-                models.VoteJWT.post_id == PostAlias.id,
-                isouter=True
-                ).filter(
-                    PostAlias.id == id
-                    ).group_by(
-                        PostAlias.id
-                        ).first()
+    query = (
+            select(PostAlias, func.count(models.VoteJWT.post_id).label("votes"))
+            .options(selectinload(PostAlias.owner))
+            .join(models.VoteJWT, models.VoteJWT.post_id == PostAlias.id, isouter=True)
+            .filter(PostAlias.id == id)
+            .group_by(PostAlias.id)
+        )
+
+    result = await db.execute(query)
+    post = result.mappings().first()
 
     try:
         if not post:
@@ -141,17 +123,18 @@ async def get_course_post(
 # to delete post from course.posts table
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_course_post(
-  id: int, db: Session = Depends(get_db),
+  id: int, db: AsyncSession = Depends(get_db),
   users_data: str = Depends(oauth2.get_current_user)):
 
     # we can access user data from token_data
     # print(users_data.id)
 
     # query to delete post by id
-    post_query = db.query(models.PostJWT).filter(models.PostJWT.id == id)
+    query = select(models.PostJWT).filter(models.PostJWT.id == id)
+    result = await db.execute(query)
 
     # retrive the post for deleting
-    post = post_query.first()
+    post = result.scalars().first()
 
     if not post:
         logger.info(f"post with id:{id} not found.")
@@ -170,10 +153,10 @@ async def delete_course_post(
         )
 
     # delete the post
-    post_query.delete(synchronize_session=False)
+    await db.delete(post)
 
     # commit the changes to database
-    db.commit()
+    await db.commit()
 
     logger.info(f"post with id:{id} deleted.")
 
@@ -183,17 +166,18 @@ async def delete_course_post(
 # to update post from course.posts table
 @router.put("/{id}")
 async def update_course_post(
-  id: int, post: schemas.PostCreate, db: Session = Depends(get_db),
+  id: int, post_schema: schemas.PostCreate, db: AsyncSession = Depends(get_db),
   users_data: str = Depends(oauth2.get_current_user)):
 
     # we can access user data from token_data
     # print(users_data.id)
 
     # query to update post by id
-    post_query = db.query(models.PostJWT).filter(models.PostJWT.id == id)
+    query = select(models.PostJWT).filter(models.PostJWT.id == id)
+    result = await db.execute(query)
 
     # retrive the post for updating
-    updated_post = post_query.first()
+    updated_post = result.scalars().first()
 
     # using index of in posts
     if not updated_post:
@@ -212,11 +196,14 @@ async def update_course_post(
         )
 
     # update the post
-    post_query.update(post.model_dump(), synchronize_session=False)
+    update_dict = post_schema.model_dump()
+    for key, value in update_dict.items():
+        setattr(updated_post, key, value)
 
     # commit the changes to database
-    db.commit()
+    await db.commit()
+    await db.refresh(updated_post)
 
     logger.info(f"post with id:{id} updated.")
 
-    return post_query.first()
+    return updated_post

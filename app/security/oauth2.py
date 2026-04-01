@@ -5,8 +5,13 @@ from jwt import PyJWTError
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
 from app.db_files.config import settings
 from app.schema import schemas
+from app.model import models
+from app.db_files.database import get_db
 
 import uuid
 
@@ -59,11 +64,22 @@ def verify_access_token(token: str, credentials_exceptions):
 
 
 # Dependency to get the current user from the token
-def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
     credentials_exceptions = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"}
         )
 
-    return verify_access_token(token, credentials_exceptions)
+    token_data = verify_access_token(token, credentials_exceptions)
+
+    # Fetch the actual user from DB to ensure they exist
+    query = (select(models.UserJWT).where(models.UserJWT.id == token_data.id))
+    result = await db.execute(query)
+    user = result.scalars().first()
+
+    if user is None:
+        raise credentials_exceptions
+
+    # Returns the full User model object
+    return user
