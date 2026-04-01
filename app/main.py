@@ -17,10 +17,12 @@ from app.db_files.config import settings
 from app.logging.logger import logger
 
 from contextlib import asynccontextmanager
-# from sqlalchemy import text
 
 from app.db_files.database import engine
+
 # from app.model.models import Base
+# from sqlalchemy import text
+
 from app.db_files.redis import init_redis, close_redis
 
 # routers for course

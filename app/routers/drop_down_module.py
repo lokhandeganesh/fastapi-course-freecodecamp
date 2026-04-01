@@ -13,6 +13,8 @@ from app.db_files.redis import get_redis, get_seconds_until_next_7am
 from app.logging.logger import logger
 from app.schema import params_schemas
 
+# from app.security import oauth2
+
 from sqlalchemy import select
 from app.model.admin_models import Village
 
@@ -24,10 +26,14 @@ router = APIRouter(tags=['Administrative-Information'])
 async def get_villages(
     village_info: params_schemas.VillageInfo,
     db: AsyncSession = Depends(get_db),
-    redis=Depends(get_redis)
+    redis=Depends(get_redis),
+    # users_data: str = Depends(oauth2.get_current_user)
   ):
     """
     """
+    # # The code below ONLY runs if the user has a valid JWT
+    # logger.info(f"User {users_data.id} is accessing village data")
+
     # Cache Key Generation (Join tuple into a string)
     cache_parts = (
         "villages",

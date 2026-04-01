@@ -50,6 +50,7 @@ def verify_access_token(token: str, credentials_exceptions):
 
         # Extract the user_id from the payload
         user_id: uuid.UUID = payload.get("sub")
+        # print(user_id)
 
         if user_id is None:
             raise credentials_exceptions
@@ -64,7 +65,7 @@ def verify_access_token(token: str, credentials_exceptions):
 
 
 # Dependency to get the current user from the token
-async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+async def _get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
     credentials_exceptions = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -83,3 +84,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
 
     # Returns the full User model object
     return user
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    credentials_exceptions = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"}
+        )
+
+    token_data = verify_access_token(token, credentials_exceptions)
+
+    # Returns the full User model object
+    return token_data

@@ -14,6 +14,7 @@ from app.schema import schemas
 from app.utils_folder import utils
 
 import uuid
+from sqlalchemy import select
 
 router = APIRouter(
     prefix="/course_users",
@@ -37,14 +38,14 @@ async def create_course_users(user: schemas.UserCreate, db: Session = Depends(ge
 
     try:
         # commit the changes to database
-        db.commit()
+        await db.commit()
         # refresh the new_user object to get created in the database
-        db.refresh(new_user)
+        await db.refresh(new_user)
 
         return new_user
 
     except IntegrityError as e:
-        db.rollback()
+        await db.rollback()
         logger.error(f"IntegrityError: {e.orig}")
 
         if "users_email_key" in str(e.orig):
@@ -60,8 +61,15 @@ async def create_course_users(user: schemas.UserCreate, db: Session = Depends(ge
 
 
 @router.get("/{id}", response_model=schemas.UserOut)
-def get_course_user(id: uuid.UUID, db: Session = Depends(get_db)):
-    user = db.query(models.UserJWT).filter(models.UserJWT.id == id).first()
+async def get_course_user(id: uuid.UUID, db: Session = Depends(get_db)):
+    # Use the select statement
+    stmt = select(models.UserJWT).where(models.UserJWT.id == id)
+
+    # 2. Execute and await the result
+    result = await db.execute(stmt)
+
+    # 3. Use scalars().first() to get the single user object
+    user = result.scalars().first()
 
     if not user:
         raise HTTPException(
