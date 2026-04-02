@@ -20,14 +20,14 @@ from contextlib import asynccontextmanager
 
 from app.db_files.database import engine
 
-# from app.model.models import Base
-# from sqlalchemy import text
+from app.model.models import Base
+from sqlalchemy import text
 
 from app.db_files.redis import init_redis, close_redis
 
 # routers for course
 from app.routers import post, user, auth, vote
-from app.routers import drop_down_module
+# from app.routers import drop_down_module
 
 """
 uncomment me and related imports to create table in database,
@@ -45,21 +45,21 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Optional Redis service is unavailable: {e}")
 
-    # # Database Schema & Table Initialization
-    # try:
-    #     async with engine.begin() as conn:
-    #         # Create the schema first
-    #         await conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
+    # Database Schema & Table Initialization
+    try:
+        async with engine.begin() as conn:
+            # Create the schema first
+            await conn.execute(text("CREATE SCHEMA IF NOT EXISTS course"))
 
-    #         # Create tables within that schema
-    #         # run_sync bridges the gap between Async engine and Sync Base.metadata
-    #         await conn.run_sync(Base.metadata.create_all)
+            # Create tables within that schema
+            # run_sync bridges the gap between Async engine and Sync Base.metadata
+            await conn.run_sync(Base.metadata.create_all)
 
-    #     logger.info("Database schema 'course' and tables verified/created.")
-    # except Exception as e:
-    #     logger.error(f"Database initialization failed: {e}")
-    #     # In production, you might want to raise this so the app doesn't start broken
-    #     raise e
+        logger.info("Database schema 'course' and tables verified/created.")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
+        # In production, you might want to raise this so the app doesn't start broken
+        raise e
 
     yield  # The app runs here
 
@@ -97,7 +97,7 @@ app.include_router(user.router)
 app.include_router(vote.router)
 app.include_router(auth.router)
 # External routers
-app.include_router(drop_down_module.router)
+# app.include_router(drop_down_module.router)
 
 
 # Fetching user database for accessing docs
